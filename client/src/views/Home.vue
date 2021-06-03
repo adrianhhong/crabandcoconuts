@@ -1,17 +1,22 @@
 <template>
   <div>
-    <h1>
-      Welcome to Skull
-    </h1>
+    <h1>Welcome to Skull</h1>
+    <v-btn @click="onClick">hihiihi</v-btn>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-
+import { socketInit } from '../socket/socket.ts';
+// import { initListeners } from '../socket/init.ts';
 
 export default {
-  name: "Home",
-
+  name: 'Home',
+  methods: {
+    onClick: function () {
+      console.log('socketinit');
+      socketInit('big lad', '1234', 'join');
+      // initListeners(this, socker);
+    },
+  },
 };
 </script>
