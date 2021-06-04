@@ -1,7 +1,8 @@
 <template>
   <div>
-    <h1>Welcome to Skull</h1>
-    <v-btn @click="onClick">hihiihi</v-btn>
+    <h1>Skull</h1>
+    <v-btn @click="onCreateGame">Create Game</v-btn>
+    <v-btn @click="onJoinGame">Join Game</v-btn>
   </div>
 </template>
 
@@ -12,11 +13,11 @@ import { socketInit } from '../socket/socket.ts';
 export default {
   name: 'Home',
   methods: {
-    onClick: function () {
-      console.log('socketinit');
-      socketInit('big lad', '1234', 'join');
+    onCreateGame: () => {
+      socketInit(username, roomId, joinOrCreate);
       // initListeners(this, socker);
     },
+    onJoinGame: () => {},
   },
 };
 </script>

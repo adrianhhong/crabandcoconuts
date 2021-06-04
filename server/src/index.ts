@@ -1,19 +1,24 @@
 import { Socket } from 'socket.io';
-import { server as serverConfig } from './config';
+import { RoomType } from '@/types';
+import Room from '@/socket/roomManager';
+import { server as serverConfig } from '@/config';
 
 const app = require('express')();
 const server = require('http').createServer(app);
-
-const options = {
-  /* ... */
-};
-const io = require('socket.io')(server, options);
+const io = require('socket.io')(server);
 
 io.on('connection', (socket: Socket) => {
   console.log('Client connected');
-  console.log(socket);
-  const { username, roomId, roomAction } = socket.handshake.query;
-  console.log(username, roomId, roomAction);
+  const { adapter } = io.of('/'); // https://socket.io/docs/v4/rooms/ adapter object that holds all the room information
+  const { username, roomId, createRoom } = socket.handshake.query;
+  const room = new Room({
+    socket,
+    adapter,
+    username,
+    roomId,
+    createRoom,
+  });
+  const createdRoomSuccesfully = await room.init(username);
 });
 
 server.listen(serverConfig.socketPort, () => {
