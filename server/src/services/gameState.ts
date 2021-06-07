@@ -1,21 +1,25 @@
-import Game from './game';
-import { GameType } from '../types';
+import Room from './roomState';
+import { RoomType } from '../types';
 
 /**
- * GameState holds all the game info
+ * GameState holds all the room info
  *
  */
 export default class GameState {
-  rooms: GameType[] = [];
+  rooms: RoomType[] = [];
 
-  newGame(username: string): GameType {
+  /**
+   * Creates a room instance, populates rooms[] and returns that instance
+   * @returns RoomType
+   */
+  newRoom(): RoomType {
     const newRoomId = this.generateCode();
-    const newGame = new Game(username, newRoomId);
-    this.rooms.push(newGame);
-    return newGame;
+    const newRoom = new Room(newRoomId);
+    this.rooms.push(newRoom);
+    return newRoom;
   }
 
-  findGame(roomId: string): any | null {
+  findRoom(roomId: string): RoomType | null {
     if (!roomId || roomId.length !== 4) return null;
     for (let i = 0; i < this.rooms.length; i++) {
       if (this.rooms[i].roomId === roomId.toLowerCase()) {
@@ -25,7 +29,7 @@ export default class GameState {
     return null;
   }
 
-  generateCode(): GameType['roomId'] {
+  generateCode(): RoomType['roomId'] {
     let code;
     do {
       code = '';
@@ -36,7 +40,7 @@ export default class GameState {
         );
       }
       //make sure the code is not already in use
-    } while (this.findGame(code));
+    } while (this.findRoom(code));
     return code;
   }
 

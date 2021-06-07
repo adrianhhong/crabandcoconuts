@@ -2,7 +2,6 @@ import { Socket, Server } from 'socket.io';
 import express from 'express';
 import { createServer } from 'http';
 
-import Room from './services/roomManager';
 import { server as serverConfig } from './config';
 import GameState from './services/gameState';
 // import { Handshake } from './types';
@@ -16,27 +15,24 @@ const io = new Server(server);
 const skull = new GameState();
 
 io.on('connection', async (socket: Socket) => {
-  console.log('Client connected');
-
-  const { adapter } = io.of('/'); // https://socket.io/docs/v4/rooms/ adapter object that holds all the room information
-
+  // const { adapter } = io.of('/'); // https://socket.io/docs/v4/rooms/ adapter object that holds all the room information
   const username = socket.handshake.query.username as string;
   const roomId = socket.handshake.query.roomId as string;
   const enterRoomAction = socket.handshake.query
     .enterRoomAction as string;
 
-  if (enterRoomAction) {
-    skull.newGame(username);
+  if (enterRoomAction === 'create') {
+    const createdRoom = skull.newRoom();
+    createdRoom.addPlayer(username, socket);
   }
-
-  // const room = new Room({
-  //   socket,
-  //   adapter,
-  //   username,
-  //   roomId,
-  //   enterRoomAction,
-  // });
-  // const createdRoomSuccesfully = await room.init(username);
+  if (enterRoomAction === 'join') {
+    const foundRoom = skull.findRoom(roomId);
+    if (foundRoom !== null) {
+      // check if name is valid
+      // add to room
+      foundRoom.addPlayer(username, socket);
+    }
+  }
 });
 
 server.listen(serverConfig.socketPort, () => {

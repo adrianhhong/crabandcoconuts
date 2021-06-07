@@ -1,8 +1,8 @@
-export default class Game {
+export default class Room {
   roomId = '';
   username = '';
 
-  constructor(username: string, roomId: string) {
+  constructor(roomId: string) {
     this.roomId = roomId;
     this.username = username;
     // this.onEmpty = onEmpty;
@@ -19,13 +19,13 @@ export default class Game {
   //   newPlayer(name, socket) {
   //     return new Player(name, socket, this.getNextId());
   //   }
-  //   addPlayer(name, socket) {
-  //     const newPlayer = this.newPlayer(name, socket);
-  //     this.initPlayer(newPlayer);
-  //     this.players.push(newPlayer);
-  //     this.sendUpdatedPlayersList();
-  //     return newPlayer;
-  //   }
+  // addPlayer(name, socket) {
+  //   const newPlayer = this.newPlayer(name, socket);
+  //   this.initPlayer(newPlayer);
+  //   this.players.push(newPlayer);
+  //   this.sendUpdatedPlayersList();
+  //   return newPlayer;
+  // }
   //   initPlayer(newPlayer) {
   //     //if this is the first user, make them host
   //     if (this.players.length === 0) {
