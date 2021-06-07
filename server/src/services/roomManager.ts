@@ -20,8 +20,9 @@ export default class Room {
     // We are joining the room
     if (this.enterRoomAction === 'join') {
       this.socket.join(this.roomId);
-      this.adapter = this.adapter.rooms.get(this.roomId);
+      // this.adapter = this.adapter.rooms.get(this.roomId);
     }
+
     return true;
   }
 }

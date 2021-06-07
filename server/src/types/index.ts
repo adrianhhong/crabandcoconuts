@@ -8,3 +8,7 @@ export interface RoomType {
   roomId: string;
   enterRoomAction: string;
 }
+
+export interface GameType {
+  roomId: string;
+}
