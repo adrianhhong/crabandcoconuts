@@ -3,7 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 
 import { server as serverConfig } from './config';
-import GameState from './services/gameState';
+import GameState from './services/game';
 // import { Handshake } from './types';
 
 // Start express server
@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-const skull = new GameState();
+const skull = new GameState(io);
 
 io.on('connection', async (socket: Socket) => {
   // const { adapter } = io.of('/'); // https://socket.io/docs/v4/rooms/ adapter object that holds all the room information

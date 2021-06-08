@@ -1,25 +1,30 @@
-import Room from './roomState';
-import { RoomType } from '../types';
+import Room from './room';
+import { GameType, RoomType } from '../types';
 
 /**
  * GameState holds all the room info
  *
  */
 export default class GameState {
-  rooms: RoomType[] = [];
+  rooms: Room[] = [];
+  io = {} as GameType['io']; // TODO: instantiate properly
+
+  constructor(io: GameType['io']) {
+    this.io = io;
+  }
 
   /**
    * Creates a room instance, populates rooms[] and returns that instance
    * @returns RoomType
    */
-  newRoom(): RoomType {
+  newRoom(): Room {
     const newRoomId = this.generateCode();
-    const newRoom = new Room(newRoomId);
+    const newRoom = new Room(this.io, newRoomId);
     this.rooms.push(newRoom);
     return newRoom;
   }
 
-  findRoom(roomId: string): RoomType | null {
+  findRoom(roomId: RoomType['roomId']): Room | null {
     if (!roomId || roomId.length !== 4) return null;
     for (let i = 0; i < this.rooms.length; i++) {
       if (this.rooms[i].roomId === roomId.toLowerCase()) {
@@ -29,7 +34,7 @@ export default class GameState {
     return null;
   }
 
-  generateCode(): RoomType['roomId'] {
+  generateCode(): string {
     let code;
     do {
       code = '';

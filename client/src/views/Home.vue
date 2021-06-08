@@ -35,8 +35,8 @@
 </template>
 
 <script>
-import { socketInit } from '../socket/socket.ts';
-// import { initListeners } from '../socket/init.ts';
+import { socketInit } from '../socket/socket';
+import { socketListeners } from '../socket/socket-listeners';
 
 export default {
   name: 'Home',
@@ -48,8 +48,8 @@ export default {
   },
   methods: {
     onCreateGame: function () {
-      socketInit(this.playerName, '', 'create');
-      // initListeners(this, socker);
+      const socket = socketInit(this.playerName, '', 'create');
+      socketListeners(socket);
     },
     onJoinGame: function () {
       socketInit(this.playerName, this.roomId, 'join');

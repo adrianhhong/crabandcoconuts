@@ -1,10 +1,17 @@
-export default class Room {
-  roomId = '';
-  username = '';
+import Player from './player';
+import { RoomType, PlayerType } from '../types';
 
-  constructor(roomId: string) {
+export default class Room {
+  io = {} as RoomType['io'];
+  players: Player[] = [];
+  roomId = '';
+  // username = '';
+
+  constructor(io: RoomType['io'], roomId: RoomType['roomId']) {
+    this.io = io;
     this.roomId = roomId;
-    this.username = username;
+
+    // this.username = username;
     // this.onEmpty = onEmpty;
     // this.players = [];
     // this.host;
@@ -16,16 +23,39 @@ export default class Room {
     // this.timeOfLastAction = new Date();
     // setTimeout(() => this.deleteGameIfEmpty(), 60 * 1000);
   }
-  //   newPlayer(name, socket) {
-  //     return new Player(name, socket, this.getNextId());
-  //   }
-  // addPlayer(name, socket) {
-  //   const newPlayer = this.newPlayer(name, socket);
-  //   this.initPlayer(newPlayer);
-  //   this.players.push(newPlayer);
-  //   this.sendUpdatedPlayersList();
-  //   return newPlayer;
-  // }
+
+  newPlayer(
+    username: PlayerType['username'],
+    socket: PlayerType['socket'],
+  ): Player {
+    return new Player(username, socket);
+  }
+
+  addPlayer(
+    username: PlayerType['username'],
+    socket: PlayerType['socket'],
+  ): Player {
+    const newPlayer = this.newPlayer(username, socket);
+    // this.initPlayer(newPlayer);
+    this.players.push(newPlayer);
+    socket.join(this.roomId);
+    this.emitUpdatedPlayerList();
+    return newPlayer;
+  }
+
+  emitUpdatedPlayerList(): void {
+    this.io
+      .to(this.roomId)
+      .emit('updatePlayerList', { usernames: this.getUsernames() });
+  }
+
+  getUsernames(): PlayerType['username'][] {
+    const usernames: PlayerType['username'][] = [];
+    this.players.forEach((player) => {
+      usernames.push(player.username);
+    });
+    return usernames;
+  }
   //   initPlayer(newPlayer) {
   //     //if this is the first user, make them host
   //     if (this.players.length === 0) {
