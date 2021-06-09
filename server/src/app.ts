@@ -4,7 +4,7 @@ import { createServer } from 'http';
 
 import { server as serverConfig } from './config';
 import GameState from './services/game';
-// import { Handshake } from './types';
+import logger from './lib/logger';
 
 // Start express server
 const app = express();
@@ -26,6 +26,8 @@ io.on('connection', async (socket: Socket) => {
   }
   if (enterRoomAction === 'join') {
     const foundRoom = skull.findRoom(roomId);
+    if (foundRoom === null) {
+    }
     if (foundRoom !== null) {
       // check if name is valid
       // add to room
@@ -35,12 +37,11 @@ io.on('connection', async (socket: Socket) => {
 });
 
 server.listen(serverConfig.socketPort, () => {
-  console.log(`Socket listening on port ${serverConfig.socketPort}!`);
+  logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
 
 app.listen(serverConfig.apiPort, () => {
-  // logger.info(`Api listening on port ${Number(API_PORT)}!`);
-  console.log(`Api listening on port ${serverConfig.apiPort}!`);
+  logger.info(`Api listening on port ${serverConfig.apiPort}!`);
 });
 
 // app.use('/', function (req, res, next) {
