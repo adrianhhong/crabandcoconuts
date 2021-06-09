@@ -45,7 +45,7 @@ export default class Room {
 
   emitUpdatedPlayerList(): void {
     this.io
-      .to(this.roomId)
+      .in(this.roomId)
       .emit('updatePlayerList', { usernames: this.getUsernames() });
   }
 

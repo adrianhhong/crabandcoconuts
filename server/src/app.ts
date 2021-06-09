@@ -15,7 +15,6 @@ const io = new Server(server);
 const skull = new GameState(io);
 
 io.on('connection', async (socket: Socket) => {
-  // const { adapter } = io.of('/'); // https://socket.io/docs/v4/rooms/ adapter object that holds all the room information
   const username = socket.handshake.query.username as string;
   const roomId = socket.handshake.query.roomId as string;
   const enterRoomAction = socket.handshake.query
