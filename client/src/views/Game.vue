@@ -1,5 +1,5 @@
 <template>
   <div>
-    <h1>Join a game</h1>
+    <h1>Play game</h1>
   </div>
 </template>

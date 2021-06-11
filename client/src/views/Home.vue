@@ -10,7 +10,13 @@
           :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
         ></v-text-field>
       </v-form>
-      <br />
+      <v-container>
+        <v-row justify="center" align="center">
+          <v-col>
+            {{ errorMessage }}
+          </v-col>
+        </v-row>
+      </v-container>
       <v-container fluid style="height: 500px">
         <v-row justify="center" align="center">
           <v-col>
@@ -46,8 +52,6 @@
 </template>
 
 <script>
-import SocketManager from '../helpers/socket-manager';
-
 export default {
   name: 'Home',
   data: () => {
@@ -62,33 +66,39 @@ export default {
         roomIdLength: (v) =>
           v.length == 4 || 'Room ID is 4 characters long',
       },
+      errorMessage: '',
     };
-  },
-  mounted: function () {
-    this.skull = new SocketManager();
   },
   methods: {
     onCreateGame: function () {
       if (this.$refs.name.validate()) {
-        const socket = this.skull.initiateSocketConnection(
-          this.playerName,
-          '',
-          'create',
-        );
-        this.skull.addSocketListeners(socket);
+        this.$socket.client.emit('newPlayerEnterRoom', {
+          username: this.playerName,
+          roomId: '',
+          enterRoomAction: 'create',
+        });
       }
     },
     onJoinGame: function () {
       const nameIsValidated = this.$refs.name.validate();
       const roomIdIsValidated = this.$refs.roomId.validate();
       if (nameIsValidated && roomIdIsValidated) {
-        const socket = this.skull.initiateSocketConnection(
-          this.playerName,
-          this.roomId,
-          'join',
-        );
-        this.skull.addSocketListeners(socket);
+        this.$socket.client.emit('newPlayerEnterRoom', {
+          username: this.playerName,
+          roomId: this.roomId,
+          enterRoomAction: 'join',
+        });
+        // this.skull.addSocketListeners(socket, this);
       }
+    },
+  },
+  sockets: {
+    updatePlayerList: function (roomId, usernames) {
+      console.log(usernames);
+      this.$router.push(`/room/${roomId}`);
+    },
+    joinRoomFail: function (message) {
+      this.errorMessage = message.message;
     },
   },
 };

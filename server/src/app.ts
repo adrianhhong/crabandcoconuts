@@ -10,30 +10,34 @@ import logger from './lib/logger';
 const app = express();
 // Start http server and then create a new Socket.IO server
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, { cors: { origin: '*' } });
 
 const skull = new GameState(io);
 
 io.on('connection', async (socket: Socket) => {
-  const username = socket.handshake.query.username as string;
-  const roomId = socket.handshake.query.roomId as string;
-  const enterRoomAction = socket.handshake.query
-    .enterRoomAction as string;
-
-  if (enterRoomAction === 'create') {
-    const createdRoom = skull.newRoom();
-    createdRoom.addPlayer(username, socket);
-  }
-  if (enterRoomAction === 'join') {
-    const foundRoom = skull.findRoom(roomId);
-    if (foundRoom === null) {
-    }
-    if (foundRoom !== null) {
-      // check if name is valid
-      // add to room
-      foundRoom.addPlayer(username, socket);
-    }
-  }
+  logger.info(`New connection: ${socket.id}`);
+  socket.on(
+    'newPlayerEnterRoom',
+    ({ username, roomId, enterRoomAction }) => {
+      if (enterRoomAction === 'create') {
+        const createdRoom = skull.newRoom();
+        createdRoom.addPlayer(username, socket);
+      }
+      if (enterRoomAction === 'join') {
+        const foundRoom = skull.findRoom(roomId);
+        if (foundRoom === null) {
+          socket.emit('joinRoomFail', {
+            message: 'Room cannot be found',
+          });
+        }
+        if (foundRoom !== null) {
+          // check if name is valid
+          // add to room
+          foundRoom.addPlayer(username, socket);
+        }
+      }
+    },
+  );
 });
 
 server.listen(serverConfig.socketPort, () => {
@@ -45,5 +49,4 @@ app.listen(serverConfig.apiPort, () => {
 });
 
 // app.use('/', function (req, res, next) {
-//   console.log('in 3000');
 // });
