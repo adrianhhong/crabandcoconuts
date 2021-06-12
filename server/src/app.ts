@@ -17,7 +17,7 @@ const skull = new GameState(io);
 io.on('connection', async (socket: Socket) => {
   logger.info(`New connection: ${socket.id}`);
   socket.on(
-    'newPlayerEnterRoom',
+    'homeNewEnterRoom',
     ({ username, roomId, enterRoomAction }) => {
       if (enterRoomAction === 'create') {
         const createdRoom = skull.newRoom();
@@ -38,6 +38,18 @@ io.on('connection', async (socket: Socket) => {
       }
     },
   );
+
+  socket.on('roomCheckIfJoined', (roomId) => {
+    const foundRoom = skull.findRoom(roomId);
+    console.log(foundRoom);
+    const usernameOfSocket = foundRoom?.getUsernameBySocketId(
+      socket['id'],
+    );
+    console.log(usernameOfSocket);
+    socket.emit('checkedIfJoined', {
+      username: usernameOfSocket,
+    });
+  });
 });
 
 server.listen(serverConfig.socketPort, () => {

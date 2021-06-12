@@ -72,7 +72,7 @@ export default {
   methods: {
     onCreateGame: function () {
       if (this.$refs.name.validate()) {
-        this.$socket.client.emit('newPlayerEnterRoom', {
+        this.$socket.client.emit('homeNewEnterRoom', {
           username: this.playerName,
           roomId: '',
           enterRoomAction: 'create',
@@ -83,12 +83,11 @@ export default {
       const nameIsValidated = this.$refs.name.validate();
       const roomIdIsValidated = this.$refs.roomId.validate();
       if (nameIsValidated && roomIdIsValidated) {
-        this.$socket.client.emit('newPlayerEnterRoom', {
+        this.$socket.client.emit('homeNewEnterRoom', {
           username: this.playerName,
           roomId: this.roomId,
           enterRoomAction: 'join',
         });
-        // this.skull.addSocketListeners(socket, this);
       }
     },
   },

@@ -10,20 +10,23 @@ export default {
   data: () => {
     return {
       playerName: '',
-      roomId: '',
-      rules: {
-        nameRequired: (v) => !!v || 'Please enter a name',
-        nameMax: (v) => v.length <= 15 || 'Max 15 characters',
-        nameMin: (v) => v.length >= 3 || 'Min 3 characters',
-        roomIdRequired: (v) => !!v || 'Please enter a room ID',
-        roomIdLength: (v) =>
-          v.length == 4 || 'Room ID is 4 characters long',
-      },
-      errorMessage: '',
     };
   },
   mounted: function () {
-    // Check if the socket exists
+    // Check if the socket exists. check if the username matches??? send over the username using vuex store?
+    this.$socket.client.emit('roomCheckIfJoined', {
+      // username: this.playerName,
+      roomId: this.$route.params,
+    });
+  },
+  sockets: {
+    checkedIfJoined: function ({ username }) {
+      if (username === '') {
+        this.$route.push('/');
+      } else {
+        console.log(username);
+      }
+    },
   },
 };
 </script>

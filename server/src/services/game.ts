@@ -26,6 +26,7 @@ export default class GameState {
 
   findRoom(roomId: RoomType['roomId']): Room | null {
     if (!roomId || roomId.length !== 4) return null;
+    console.log(this.rooms);
     for (let i = 0; i < this.rooms.length; i++) {
       if (this.rooms[i].roomId === roomId.toLowerCase()) {
         return this.rooms[i];

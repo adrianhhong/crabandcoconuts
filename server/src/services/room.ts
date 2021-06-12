@@ -56,6 +56,17 @@ export default class Room {
     });
     return usernames;
   }
+
+  getUsernameBySocketId(
+    id: PlayerType['socket']['id'],
+  ): PlayerType['username'] | null {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].socket.id === id) {
+        return this.players[i].username;
+      }
+    }
+    return null;
+  }
   //   initPlayer(newPlayer) {
   //     //if this is the first user, make them host
   //     if (this.players.length === 0) {
