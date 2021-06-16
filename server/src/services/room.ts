@@ -45,7 +45,7 @@ export default class Room {
   emitUpdatedPlayerList(): void {
     this.io
       .in(this.roomId)
-      .emit('updatePlayerList', this.roomId, this.getUsernames());
+      .emit('updatePlayerList', { usernames: this.getUsernames() });
   }
 
   getUsernames(): PlayerType['username'][] {
@@ -56,15 +56,26 @@ export default class Room {
     return usernames;
   }
 
-  getUsernameBySocketId(
+  checkIfUserExistsBySocketId(
     id: PlayerType['socket']['id'],
-  ): PlayerType['username'] | null {
+  ): boolean {
     for (let i = 0; i < this.players.length; i++) {
       if (this.players[i].socket.id === id) {
-        return this.players[i].username;
+        return true;
       }
     }
-    return null;
+    return false;
+  }
+
+  checkIfDuplicateUsername(
+    username: PlayerType['username'],
+  ): boolean {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].username === username) {
+        return true;
+      }
+    }
+    return false;
   }
   //   initPlayer(newPlayer) {
   //     //if this is the first user, make them host

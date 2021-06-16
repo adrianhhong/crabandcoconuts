@@ -23,7 +23,7 @@ io.on('connection', async (socket: Socket) => {
       if (enterRoomAction === 'create') {
         const createdRoom = skull.newRoom();
         createdRoom.addPlayer(username, socket);
-        socket.emit('createRoomSuccess', {
+        socket.emit('enterRoomSuccess', {
           username: username,
           roomId: createdRoom.roomId,
         });
@@ -37,21 +37,37 @@ io.on('connection', async (socket: Socket) => {
         }
         if (foundRoom !== null) {
           // check if name is valid
+          const usernameDuplicated =
+            foundRoom.checkIfDuplicateUsername(username);
+          if (usernameDuplicated) {
+            socket.emit('joinRoomFail', {
+              message: 'Name already taken',
+            });
+          }
           // add to room
           foundRoom.addPlayer(username, socket);
+          socket.emit('enterRoomSuccess', {
+            username: username,
+            roomId: foundRoom.roomId,
+          });
         }
       }
     },
   );
 
+  /**
+   * If new connection socket is already in room, update everyones playerList, if not, return null
+   */
   socket.on('roomCheckIfJoined', ({ roomId }) => {
     const foundRoom = skull.findRoom(roomId);
-    const usernameOfSocket = foundRoom?.getUsernameBySocketId(
+    const userExists = foundRoom?.checkIfUserExistsBySocketId(
       socket['id'],
     );
-    socket.emit('checkedIfJoined', {
-      username: usernameOfSocket,
-    });
+    if (userExists) {
+      foundRoom?.emitUpdatedPlayerList();
+    } else {
+      socket.emit('updatePlayerList', { usernames: null });
+    }
   });
 });
 

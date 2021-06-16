@@ -4,7 +4,7 @@
       <h1 class="text-center">☠️ skull ☠️</h1>
       <v-form ref="name">
         <v-text-field
-          v-model="playerName"
+          v-model="username"
           label="Enter your name"
           maxlength="15"
           :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
@@ -56,12 +56,12 @@ export default {
   name: 'Home',
   data: () => {
     return {
-      playerName: '',
+      username: '',
       roomId: '',
       rules: {
         nameRequired: (v) => !!v || 'Please enter a name',
         nameMax: (v) => v.length <= 15 || 'Max 15 characters',
-        nameMin: (v) => v.length >= 3 || 'Min 3 characters',
+        nameMin: (v) => v.trim().length > 0 || 'Please enter a name',
         roomIdRequired: (v) => !!v || 'Please enter a room ID',
         roomIdLength: (v) =>
           v.length == 4 || 'Room ID is 4 characters long',
@@ -73,7 +73,7 @@ export default {
     onCreateGame: function () {
       if (this.$refs.name.validate()) {
         this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.playerName,
+          username: this.username.trim(),
           roomId: '',
           enterRoomAction: 'create',
         });
@@ -84,7 +84,7 @@ export default {
       const roomIdIsValidated = this.$refs.roomId.validate();
       if (nameIsValidated && roomIdIsValidated) {
         this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.playerName,
+          username: this.username.trim(),
           roomId: this.roomId,
           enterRoomAction: 'join',
         });
@@ -92,15 +92,21 @@ export default {
     },
   },
   sockets: {
-    createRoomSuccess: function ({ playerName, roomId }) {
-      this.$store.commit('createRoomInfo', {
-        playerName: playerName,
+    /**
+     * On successfully created room, commit username and roomId to store, and route to room
+     */
+    enterRoomSuccess: function ({ username, roomId }) {
+      this.$store.commit('mutatePlayerDetails', {
+        username: username,
         roomId: roomId,
       });
       this.$router.push(`/room/${roomId}`);
     },
-    joinRoomFail: function (message) {
-      this.errorMessage = message.message;
+    /**
+     * On a failure to join room, show error message
+     */
+    joinRoomFail: function ({ message }) {
+      this.errorMessage = message;
     },
   },
 };

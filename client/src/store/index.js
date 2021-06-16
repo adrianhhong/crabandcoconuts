@@ -5,12 +5,12 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    playerName: '',
+    username: '',
     roomId: '',
   },
   mutations: {
-    createRoomInfo(state, payload) {
-      state.playerName = payload.playerName;
+    mutatePlayerDetails(state, payload) {
+      state.username = payload.username;
       state.roomId = payload.roomId;
     },
   },
