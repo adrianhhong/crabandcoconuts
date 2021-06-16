@@ -39,7 +39,6 @@ export default class Room {
     // this.initPlayer(newPlayer);
     this.players.push(newPlayer);
     socket.join(this.roomId);
-    this.emitUpdatedPlayerList();
     return newPlayer;
   }
 

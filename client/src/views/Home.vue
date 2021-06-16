@@ -92,8 +92,11 @@ export default {
     },
   },
   sockets: {
-    updatePlayerList: function (roomId, usernames) {
-      console.log(usernames);
+    createRoomSuccess: function ({ playerName, roomId }) {
+      this.$store.commit('createRoomInfo', {
+        playerName: playerName,
+        roomId: roomId,
+      });
       this.$router.push(`/room/${roomId}`);
     },
     joinRoomFail: function (message) {

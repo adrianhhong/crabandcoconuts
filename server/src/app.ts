@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { server as serverConfig } from './config';
 import GameState from './services/game';
 import logger from './lib/logger';
+import { RoomType } from './types';
 
 // Start express server
 const app = express();
@@ -22,6 +23,10 @@ io.on('connection', async (socket: Socket) => {
       if (enterRoomAction === 'create') {
         const createdRoom = skull.newRoom();
         createdRoom.addPlayer(username, socket);
+        socket.emit('createRoomSuccess', {
+          username: username,
+          roomId: createdRoom.roomId,
+        });
       }
       if (enterRoomAction === 'join') {
         const foundRoom = skull.findRoom(roomId);
@@ -39,13 +44,11 @@ io.on('connection', async (socket: Socket) => {
     },
   );
 
-  socket.on('roomCheckIfJoined', (roomId) => {
+  socket.on('roomCheckIfJoined', ({ roomId }) => {
     const foundRoom = skull.findRoom(roomId);
-    console.log(foundRoom);
     const usernameOfSocket = foundRoom?.getUsernameBySocketId(
       socket['id'],
     );
-    console.log(usernameOfSocket);
     socket.emit('checkedIfJoined', {
       username: usernameOfSocket,
     });
