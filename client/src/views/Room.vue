@@ -1,26 +1,41 @@
 <template>
   <div>
-    <h1>Lobby</h1>
-    <h2>{{ roomId }}</h2>
-
-    <v-card class="mx-auto" max-width="300" tile>
-      <v-list disabled>
-        <v-subheader>Players</v-subheader>
-        <v-list-item-group color="primary">
-          <v-list-item v-for="(p, i) in usernames" :key="i">
-            <v-list-item-title
-              v-text="p"
-              style="text-align: left"
-            ></v-list-item-title>
-            <v-list-item-icon>
-              <v-icon v-if="p === username" color="secondary" right>
-                mdi-skull
-              </v-icon>
-            </v-list-item-icon>
-          </v-list-item>
-        </v-list-item-group>
-      </v-list>
-    </v-card>
+    <v-container class="text-center" style="max-width: 600px">
+      <h1 class="text-center">Lobby</h1>
+      <h3>room code:</h3>
+      <v-btn
+        rounded
+        color="secondary"
+        v-clipboard:copy="roomId"
+        :loading="showLoaderText"
+        :disabled="showLoaderText"
+        @click="showLoaderText = true"
+        class="text-lowercase"
+      >
+        {{ roomId }}
+        <template v-slot:loader>
+          <span>Copied!</span>
+        </template>
+      </v-btn>
+      <v-card class="mx-auto" max-width="300" tile>
+        <v-list disabled>
+          <v-subheader>Players</v-subheader>
+          <v-list-item-group color="primary">
+            <v-list-item v-for="(p, i) in usernames" :key="i">
+              <v-list-item-title
+                v-text="p"
+                style="text-align: left"
+              ></v-list-item-title>
+              <v-list-item-icon>
+                <v-icon v-if="p === username" color="secondary" right>
+                  mdi-skull
+                </v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-card>
+    </v-container>
   </div>
 </template>
 
@@ -31,6 +46,7 @@ export default {
   data: () => {
     return {
       usernames: [],
+      showLoaderText: false,
     };
   },
   mounted: function () {
@@ -53,5 +69,12 @@ export default {
     },
   },
   computed: mapState(['username', 'roomId']),
+  watch: {
+    showLoaderText() {
+      if (this.showLoaderText) {
+        setTimeout(() => (this.showLoaderText = false), 1500);
+      }
+    },
+  },
 };
 </script>

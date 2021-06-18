@@ -5,7 +5,6 @@ import { createServer } from 'http';
 import { server as serverConfig } from './config';
 import GameState from './services/game';
 import logger from './lib/logger';
-import { RoomType } from './types';
 
 // Start express server
 const app = express();
@@ -27,6 +26,7 @@ io.on('connection', async (socket: Socket) => {
           username: username,
           roomId: createdRoom.roomId,
         });
+        logger.info(`Room created: ${roomId}`);
       }
       if (enterRoomAction === 'join') {
         const foundRoom = skull.findRoom(roomId);
@@ -50,6 +50,7 @@ io.on('connection', async (socket: Socket) => {
             username: username,
             roomId: foundRoom.roomId,
           });
+          logger.info(`${username} joined ${roomId}`);
         }
       }
     },

@@ -1,18 +1,25 @@
 import Player from './player';
 import { RoomType, PlayerType } from '../types';
+import logger from '../lib/logger';
 
 export default class Room {
-  io = {} as RoomType['io'];
+  io: RoomType['io'];
   players: Player[] = [];
   roomId = '';
+  onEmpty: () => void;
   // username = '';
 
-  constructor(io: RoomType['io'], roomId: RoomType['roomId']) {
+  constructor(
+    io: RoomType['io'],
+    roomId: RoomType['roomId'],
+    onEmpty: () => void,
+  ) {
     this.io = io;
     this.roomId = roomId;
+    this.onEmpty = onEmpty;
 
     // this.username = username;
-    // this.onEmpty = onEmpty;
+
     // this.players = [];
     // this.host;
     // this.inProgress = false;
@@ -36,7 +43,7 @@ export default class Room {
     socket: PlayerType['socket'],
   ): Player {
     const newPlayer = this.newPlayer(username, socket);
-    // this.initPlayer(newPlayer);
+    this.initPlayer(newPlayer);
     this.players.push(newPlayer);
     socket.join(this.roomId);
     return newPlayer;
@@ -77,84 +84,44 @@ export default class Room {
     }
     return false;
   }
-  //   initPlayer(newPlayer) {
-  //     //if this is the first user, make them host
-  //     if (this.players.length === 0) {
-  //       this.host = newPlayer;
-  //       newPlayer.makeHost();
-  //     }
-  //     //when this player disconnects, remove them from this game
-  //     newPlayer.socket.on('disconnect', () => {
-  //       newPlayer.isConnected = false;
-  //       if (this.inProgress) {
-  //         this.currentRound.findReplacementFor(newPlayer, this.code);
-  //       } else {
-  //         this.removePlayer(newPlayer.id);
-  //       }
-  //       this.onPlayerDisconnect(newPlayer);
-  //       this.sendUpdatedPlayersList();
-  //     });
-  //     newPlayer.socket.on('viewPreviousResults', () => {
-  //       if (
-  //         this.currentRound &&
-  //         this.currentRound.canViewLastRoundResults
-  //       ) {
-  //         newPlayer.send('viewResults', {
-  //           chains: this.currentRound.getAllChains(),
-  //           isViewPreviousResults: true,
-  //         });
-  //       }
-  //     });
-  //   }
-  //   onPlayerDisconnect({ id }) {
-  //     const noHost = !this.host;
-  //     const playerWasHost = this.host && id === this.host.id;
-  //     if (playerWasHost || noHost) {
-  //       this.host = undefined;
-  //       //find the first connected player to be host
-  //       for (let i = 0; i < this.players.length; i++) {
-  //         const thisPlayer = this.players[i];
-  //         if (thisPlayer.isConnected && !thisPlayer.isAi) {
-  //           this.host = thisPlayer;
-  //           thisPlayer.makeHost();
-  //           break;
-  //         }
-  //       }
-  //     }
-  //     this.deleteGameIfEmpty();
-  //   }
-  //   deleteGameIfEmpty() {
-  //     if (this.code === 'ffff') return;
-  //     let allPlayersDisconnected = true;
-  //     for (let j = 0; j < this.players.length; j++) {
-  //       if (this.players[j].isConnected && !this.players[j].isAi) {
-  //         allPlayersDisconnected = false;
-  //         break;
-  //       }
-  //     }
-  //     if (allPlayersDisconnected) {
-  //       this.onEmpty();
-  //     }
-  //   }
-  //   removePlayer(id) {
-  //     const player = this.getPlayer(id);
-  //     const index = this.players.indexOf(player);
-  //     if (index > -1) {
-  //       this.players.splice(index, 1);
-  //     }
-  //     //if there are no players left
-  //     if (this.players.length === 0) {
-  //       this.onEmpty();
-  //     }
-  //   }
-  //   getPlayer(id) {
-  //     for (let i = 0; i < this.players.length; i++) {
-  //       if (this.players[i].id === id) {
-  //         return this.players[i];
-  //       }
-  //     }
-  //     return false;
-  //   }
+
+  initPlayer(newPlayer: PlayerType): void {
+    // //if this is the first user, make them host
+    // if (this.players.length === 0) {
+    //   this.host = newPlayer;
+    //   newPlayer.makeHost();
+    // }
+    //when this player disconnects, remove them from this game
+    newPlayer.socket.on('disconnect', () => {
+      this.removePlayer(newPlayer.username);
+      this.emitUpdatedPlayerList();
+    });
+  }
+
+  removePlayer(username: PlayerType['username']): void {
+    const player = this.findPlayer(username);
+    if (player !== null) {
+      const index = this.players.indexOf(player);
+      if (index > -1) {
+        this.players.splice(index, 1);
+        logger.info(`${username} left ${this.roomId}`);
+      }
+      //if there are no players left
+      if (this.players.length === 0) {
+        this.onEmpty();
+      }
+    }
+  }
+
+  findPlayer(username: PlayerType['username']): PlayerType | null {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].username === username) {
+        return this.players[i];
+      }
+    }
+    return null;
+  }
+
   //   getNextId() {
   //     return this.currentId++;
   //   }
@@ -176,14 +143,7 @@ export default class Room {
   //     };
   //     return jsonGame;
   //   }
-  //   sendUpdatedPlayersList() {
-  //     this.sendToAll('updatePlayerList', {
-  //       players: this.getJsonGame().players,
-  //       canViewLastRoundResults:
-  //         this.currentRound !== undefined &&
-  //         this.currentRound.canViewLastRoundResults,
-  //     });
-  //   }
+
   //   sendToAll(event, data) {
   //     this.players.forEach((player) => {
   //       player.socket.emit(event, {

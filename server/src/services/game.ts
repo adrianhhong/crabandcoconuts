@@ -1,5 +1,6 @@
 import Room from './room';
 import { GameType, RoomType } from '../types';
+import logger from '../lib/logger';
 
 /**
  * GameState holds all the room info
@@ -19,7 +20,10 @@ export default class GameState {
    */
   newRoom(): Room {
     const newRoomId = this.generateCode();
-    const newRoom = new Room(this.io, newRoomId);
+    const newRoom = new Room(this.io, newRoomId, () => {
+      // will be ran when this room has 0 players left
+      this.removeGame(newRoomId);
+    });
     this.rooms.push(newRoom);
     return newRoom;
   }
@@ -49,12 +53,14 @@ export default class GameState {
     return code;
   }
 
-  //   removeGame(code) {
-  //     const game = this.findGame(code);
-
-  //     const index = this.games.indexOf(game);
-  //     if (index > -1) {
-  //       this.games.splice(index, 1);
-  //     }
-  //   }
+  removeGame(roomId: RoomType['roomId']): void {
+    const room = this.findRoom(roomId);
+    if (room !== null) {
+      const index = this.rooms.indexOf(room);
+      if (index > -1) {
+        this.rooms.splice(index, 1);
+      }
+      logger.info(`Room removed: ${roomId}`);
+    }
+  }
 }
