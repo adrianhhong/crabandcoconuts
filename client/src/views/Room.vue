@@ -28,13 +28,23 @@
               ></v-list-item-title>
               <v-list-item-icon>
                 <v-icon v-if="p === username" color="secondary" right>
-                  mdi-skull
+                  mdi-flower
                 </v-icon>
               </v-list-item-icon>
             </v-list-item>
           </v-list-item-group>
         </v-list>
       </v-card>
+      <v-container>
+        <v-row>
+          <v-col>
+            <v-btn rounded @click="onStartGame">Start Game</v-btn>
+          </v-col>
+          <v-col>
+            <v-btn rounded @click="onLeaveRoom">Leave Room</v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-container>
   </div>
 </template>
@@ -57,6 +67,15 @@ export default {
       // username: this.username,
       roomId: this.$route.params.roomId,
     });
+  },
+  methods: {
+    onLeaveRoom: function () {
+      this.$socket.client.emit('roomLeave', {
+        username: this.username.trim(),
+        roomId: this.roomId,
+      });
+      this.$router.push('/');
+    },
   },
   sockets: {
     updatePlayerList: function ({ usernames }) {

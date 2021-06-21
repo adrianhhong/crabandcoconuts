@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container style="max-width: 600px">
-      <h1 class="text-center">☠️ skull ☠️</h1>
+      <h1 class="text-center">skull</h1>
       <v-form ref="name">
         <v-text-field
           v-model="username"

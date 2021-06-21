@@ -26,7 +26,7 @@ io.on('connection', async (socket: Socket) => {
           username: username,
           roomId: createdRoom.roomId,
         });
-        logger.info(`Room created: ${roomId}`);
+        logger.info(`Room created: ${createdRoom.roomId}`);
       }
       if (enterRoomAction === 'join') {
         const foundRoom = skull.findRoom(roomId);
@@ -43,14 +43,15 @@ io.on('connection', async (socket: Socket) => {
             socket.emit('joinRoomFail', {
               message: 'Name already taken',
             });
+          } else {
+            // add to room
+            foundRoom.addPlayer(username, socket);
+            socket.emit('enterRoomSuccess', {
+              username: username,
+              roomId: foundRoom.roomId,
+            });
+            logger.info(`${username} joined ${roomId}`);
           }
-          // add to room
-          foundRoom.addPlayer(username, socket);
-          socket.emit('enterRoomSuccess', {
-            username: username,
-            roomId: foundRoom.roomId,
-          });
-          logger.info(`${username} joined ${roomId}`);
         }
       }
     },
@@ -69,6 +70,17 @@ io.on('connection', async (socket: Socket) => {
     } else {
       socket.emit('updatePlayerList', { usernames: null });
     }
+  });
+
+  socket.on('roomLeave', ({ username, roomId }) => {
+    const foundRoom = skull.findRoom(roomId);
+    const userExists = foundRoom?.checkIfUserExistsBySocketId(
+      socket['id'],
+    );
+    if (userExists) {
+      foundRoom?.removePlayer(username);
+    }
+    foundRoom?.emitUpdatedPlayerList();
   });
 });
 

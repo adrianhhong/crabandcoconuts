@@ -11,7 +11,7 @@ export default new Vuetify({
       light: {
         primary: '#174D77',
         accent: '#B79A85',
-        secondary: '#2F3785',
+        secondary: '#477180',
         success: '#4CAF50', // POST
         info: '#2196F3', // GET
         warning: '#FF9800', // PATCH
@@ -22,7 +22,7 @@ export default new Vuetify({
       dark: {
         primary: '#4A92FF',
         accent: '#B79A85',
-        secondary: '#2F3785',
+        secondary: '#477180',
         success: '#4CAF50', // POST
         info: '#2196F3', // GET
         warning: '#FF9800', // PATCH
