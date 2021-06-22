@@ -100,7 +100,7 @@ export default {
         username: username,
         roomId: roomId,
       });
-      this.$router.push(`/room/${roomId}`);
+      this.$router.push(`/${roomId}`);
     },
     /**
      * On a failure to join room, show error message

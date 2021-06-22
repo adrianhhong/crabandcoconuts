@@ -11,22 +11,13 @@ const routes = [
     component: Home,
   },
   {
-    path: '/room/:roomId',
+    path: '/:roomId',
     name: 'Room',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/Room.vue'),
+    component: () => import('../views/Room.vue'),
   },
   {
-    path: '/game/:roomId',
-    name: 'Game',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ '../views/Game.vue'),
+    path: '*',
+    redirect: { name: 'Home' }, // Return to Home if URL is not defined. 'Catch all' route.
   },
 ];
 
