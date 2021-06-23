@@ -15,6 +15,5 @@ export default class Player {
 
   makeHost(): void {
     this.isHost = true;
-    // this.socket.emit('hostUpdatedSettings');
   }
 }

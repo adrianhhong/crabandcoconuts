@@ -23,11 +23,22 @@
           <v-list-item-group color="primary">
             <v-list-item v-for="(p, i) in usernames" :key="i">
               <v-list-item-title
+                v-if="p === username"
+                class="font-weight-black accent--text"
+                v-text="p"
+                style="text-align: left"
+              ></v-list-item-title>
+              <v-list-item-title
+                v-if="p !== username"
                 v-text="p"
                 style="text-align: left"
               ></v-list-item-title>
               <v-list-item-icon>
-                <v-icon v-if="p === username" color="secondary" right>
+                <v-icon
+                  v-if="p === hostUsername"
+                  color="secondary"
+                  right
+                >
                   mdi-flower
                 </v-icon>
               </v-list-item-icon>
@@ -38,7 +49,19 @@
       <v-container>
         <v-row>
           <v-col>
-            <v-btn rounded @click="onStartGame">Start Game</v-btn>
+            <v-btn
+              v-if="username === hostUsername"
+              rounded
+              @click="onStartGame"
+              >Start Game</v-btn
+            >
+            <v-btn
+              v-if="username !== hostUsername"
+              rounded
+              @click="onStartGame"
+              disabled
+              >Start Game</v-btn
+            >
           </v-col>
           <v-col>
             <v-btn rounded @click="onLeaveRoom">Leave Room</v-btn>
@@ -57,6 +80,7 @@ export default {
     return {
       usernames: [],
       showLoaderText: false,
+      hostUsername: '',
     };
   },
   beforeCreate: function () {
@@ -80,7 +104,8 @@ export default {
     },
   },
   sockets: {
-    updatePlayerList: function ({ usernames }) {
+    updatePlayerList: function ({ usernames, hostUsername }) {
+      this.hostUsername = hostUsername;
       if (usernames === null) {
         this.$router.push('/');
       }
@@ -89,7 +114,7 @@ export default {
       }
     },
   },
-  computed: mapState(['username', 'roomId']),
+  computed: mapState(['username', 'roomId']), //, 'hostUsername']),
   watch: {
     showLoaderText() {
       if (this.showLoaderText) {

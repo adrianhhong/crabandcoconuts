@@ -34,10 +34,17 @@ export default class Room {
     socket: PlayerType['socket'],
   ): Player {
     const newPlayer = new Player(username, socket);
+    socket.join(this.roomId);
     // if no players, make new player host
     if (this.players.length === 0) {
       this.host = newPlayer;
       newPlayer.makeHost();
+      // this.io
+      //   .in(this.roomId)
+      //   .emit('UPDATEHOST', { hostUsername: username }); //  we need to clean up the host when leaving room....
+      logger.info(
+        `${username} is now the host of rooom: ${this.roomId}`,
+      );
     }
     // remove player from game on disconnect
     newPlayer.socket.on('disconnect', () => {
@@ -45,14 +52,14 @@ export default class Room {
       this.emitUpdatedPlayerList();
     });
     this.players.push(newPlayer);
-    socket.join(this.roomId);
     return newPlayer;
   }
 
   emitUpdatedPlayerList(): void {
-    this.io
-      .in(this.roomId)
-      .emit('updatePlayerList', { usernames: this.getUsernames() });
+    this.io.in(this.roomId).emit('updatePlayerList', {
+      usernames: this.getUsernames(),
+      hostUsername: this.host.username,
+    });
   }
 
   getUsernames(): PlayerType['username'][] {
