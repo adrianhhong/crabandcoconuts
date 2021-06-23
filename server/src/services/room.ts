@@ -4,22 +4,20 @@ import logger from '../lib/logger';
 
 export default class Room {
   io: RoomType['io'];
-  players: Player[] = [];
-  roomId = '';
-  onEmpty: () => void;
-  // username = '';
+  players: RoomType['players'] = [];
+  roomId: RoomType['roomId'];
+  host = {} as RoomType['host']; // TODO: Fix this instantiating, {} isnt the same as an instance of the class
+  onEmpty: RoomType['onEmpty'];
 
   constructor(
     io: RoomType['io'],
     roomId: RoomType['roomId'],
-    onEmpty: () => void,
+    onEmpty: RoomType['onEmpty'],
   ) {
     this.io = io;
     this.roomId = roomId;
     this.onEmpty = onEmpty;
-
     // this.username = username;
-
     // this.players = [];
     // this.host;
     // this.inProgress = false;
@@ -31,19 +29,21 @@ export default class Room {
     // setTimeout(() => this.deleteGameIfEmpty(), 60 * 1000);
   }
 
-  newPlayer(
-    username: PlayerType['username'],
-    socket: PlayerType['socket'],
-  ): Player {
-    return new Player(username, socket);
-  }
-
   addPlayer(
     username: PlayerType['username'],
     socket: PlayerType['socket'],
   ): Player {
-    const newPlayer = this.newPlayer(username, socket);
-    this.initPlayer(newPlayer);
+    const newPlayer = new Player(username, socket);
+    // if no players, make new player host
+    if (this.players.length === 0) {
+      this.host = newPlayer;
+      newPlayer.makeHost();
+    }
+    // remove player from game on disconnect
+    newPlayer.socket.on('disconnect', () => {
+      this.removePlayer(newPlayer.username);
+      this.emitUpdatedPlayerList();
+    });
     this.players.push(newPlayer);
     socket.join(this.roomId);
     return newPlayer;
@@ -85,19 +85,6 @@ export default class Room {
     return false;
   }
 
-  initPlayer(newPlayer: PlayerType): void {
-    // //if this is the first user, make them host
-    // if (this.players.length === 0) {
-    //   this.host = newPlayer;
-    //   newPlayer.makeHost();
-    // }
-    //when this player disconnects, remove them from this game
-    newPlayer.socket.on('disconnect', () => {
-      this.removePlayer(newPlayer.username);
-      this.emitUpdatedPlayerList();
-    });
-  }
-
   removePlayer(username: PlayerType['username']): void {
     const player = this.findPlayer(username);
     if (player !== null) {
@@ -109,11 +96,19 @@ export default class Room {
       //if there are no players left
       if (this.players.length === 0) {
         this.onEmpty();
+      } else {
+        // make next player the host
+        for (let i = 0; i < this.players.length; i++) {
+          const nextPlayer = this.players[i];
+          this.host = nextPlayer;
+          nextPlayer.makeHost();
+          break;
+        }
       }
     }
   }
 
-  findPlayer(username: PlayerType['username']): PlayerType | null {
+  findPlayer(username: PlayerType['username']): Player | null {
     for (let i = 0; i < this.players.length; i++) {
       if (this.players[i].username === username) {
         return this.players[i];

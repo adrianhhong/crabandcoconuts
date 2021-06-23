@@ -11,10 +11,12 @@ export interface RoomType {
   io: Server;
   players: Player[];
   roomId: string;
-  // enterRoomAction: string;
+  host: Player;
+  onEmpty: () => void;
 }
 
 export interface PlayerType {
   username: string;
   socket: Socket;
+  isHost: boolean;
 }
