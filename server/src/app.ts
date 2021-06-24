@@ -44,7 +44,6 @@ io.on('connection', async (socket: Socket) => {
               message: 'Name already taken',
             });
           } else {
-            // add to room
             foundRoom.addPlayer(username, socket);
             socket.emit('enterRoomSuccess', {
               username: username,

@@ -10,13 +10,6 @@
           :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
         ></v-text-field>
       </v-form>
-      <v-container>
-        <v-row justify="center" align="center">
-          <v-col>
-            {{ errorMessage }}
-          </v-col>
-        </v-row>
-      </v-container>
       <v-container fluid style="height: 500px">
         <v-row justify="center" align="center">
           <v-col>
@@ -48,6 +41,20 @@
         </v-row></v-container
       >
     </v-container>
+    <v-snackbar v-model="snackbarShow">
+      {{ errorMessage }}
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="secondary"
+          text
+          v-bind="attrs"
+          @click="snackbarShow = false"
+          icon
+        >
+          <v-icon> mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -67,6 +74,7 @@ export default {
           v.length == 4 || 'Room ID is 4 characters long',
       },
       errorMessage: '',
+      snackbarShow: false,
     };
   },
   methods: {
@@ -107,6 +115,7 @@ export default {
      */
     joinRoomFail: function ({ message }) {
       this.errorMessage = message;
+      this.snackbarShow = true;
     },
   },
 };

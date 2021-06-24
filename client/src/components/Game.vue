@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1>game</h1>
+    <v-container class="text-center" style="max-width: 600px">
+      <h1 class="text-center">Lobby</h1>
+    </v-container>
   </div>
 </template>
 

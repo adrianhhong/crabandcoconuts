@@ -22,18 +22,25 @@
           <v-subheader>Players</v-subheader>
           <v-list-item-group color="primary">
             <v-list-item v-for="(p, i) in usernames" :key="i">
-              <v-list-item-title
+              <v-badge
                 v-if="p === username"
-                class="font-weight-black accent--text"
-                v-text="p"
-                style="text-align: left"
-              ></v-list-item-title>
+                color="secondary"
+                content="me"
+              >
+                <v-list-item-title
+                  v-if="p === username"
+                  class="font-weight-black secondary--text"
+                  v-text="p"
+                  style="text-align: left"
+                >
+                </v-list-item-title
+              ></v-badge>
               <v-list-item-title
                 v-if="p !== username"
                 v-text="p"
                 style="text-align: left"
               ></v-list-item-title>
-              <v-list-item-icon>
+              <v-list-item-action>
                 <v-icon
                   v-if="p === hostUsername"
                   color="secondary"
@@ -41,7 +48,7 @@
                 >
                   mdi-flower
                 </v-icon>
-              </v-list-item-icon>
+              </v-list-item-action>
             </v-list-item>
           </v-list-item-group>
         </v-list>
@@ -50,18 +57,48 @@
         <v-row>
           <v-col>
             <v-btn
-              v-if="username === hostUsername"
+              v-if="
+                username === hostUsername && usernames.length >= 3
+              "
               rounded
               @click="onStartGame"
               >Start Game</v-btn
             >
-            <v-btn
-              v-if="username !== hostUsername"
-              rounded
-              @click="onStartGame"
-              disabled
-              >Start Game</v-btn
-            >
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <span v-bind="attrs" v-on="on">
+                  <v-btn
+                    v-if="
+                      username === hostUsername &&
+                      usernames.length < 3
+                    "
+                    rounded
+                    disabled
+                    >Start Game</v-btn
+                  ></span
+                >
+              </template>
+              <span>Requires 3 people to start</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <span v-bind="attrs" v-on="on">
+                  <v-btn
+                    v-if="username !== hostUsername"
+                    rounded
+                    disabled
+                    >Start Game</v-btn
+                  ></span
+                >
+              </template>
+              <span
+                >Only the host
+                <span class="font-weight-black secondary--text">{{
+                  hostUsername
+                }}</span>
+                can start the game</span
+              >
+            </v-tooltip>
           </v-col>
           <v-col>
             <v-btn rounded @click="onLeaveRoom">Leave Room</v-btn>
@@ -114,7 +151,7 @@ export default {
       }
     },
   },
-  computed: mapState(['username', 'roomId']), //, 'hostUsername']),
+  computed: mapState(['username', 'roomId']),
   watch: {
     showLoaderText() {
       if (this.showLoaderText) {
