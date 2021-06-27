@@ -9,7 +9,7 @@
 
 <script>
 import Lobby from '../components/Lobby.vue';
-import Game from '../components/Game.vue';
+import Game from '../components/Game/Game.vue';
 export default {
   name: 'Room',
   components: {
