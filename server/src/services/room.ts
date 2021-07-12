@@ -1,6 +1,7 @@
 import Player from './player';
-import { RoomType, PlayerType } from '../types';
+import { RoomType, PlayerType, PlayerButtonState } from '../types';
 import logger from '../lib/logger';
+import { colors } from '../config';
 
 export default class Room {
   io: RoomType['io'];
@@ -8,6 +9,7 @@ export default class Room {
   roomId: RoomType['roomId'];
   host = {} as RoomType['host']; // TODO: Fix this instantiating, {} isnt the same as an instance of the class
   onEmpty: RoomType['onEmpty'];
+  activePlayer = '';
 
   constructor(
     io: RoomType['io'],
@@ -33,7 +35,11 @@ export default class Room {
     username: PlayerType['username'],
     socket: PlayerType['socket'],
   ): Player {
-    const newPlayer = new Player(username, socket);
+    const newPlayer = new Player(
+      username,
+      socket,
+      colors[this.players.length],
+    );
     socket.join(this.roomId);
     // if no players, make new player host
     if (this.players.length === 0) {
@@ -122,6 +128,30 @@ export default class Room {
       }
     }
     return null;
+  }
+
+  startGame(): void {
+    const randomPlayerIndex = Math.floor(
+      Math.random() * this.players.length,
+    );
+    this.activePlayer = this.players[randomPlayerIndex].username;
+    this.io.in(this.roomId).emit('startGame');
+    this.io.in(this.roomId).emit('updateGameState', {
+      gameState: this.getGameState(),
+      activePlayer: this.activePlayer,
+    });
+  }
+
+  getGameState(): PlayerButtonState[] {
+    return this.players.map((player) => {
+      return {
+        player: player.username,
+        turnIndicator:
+          player.username === this.activePlayer ? true : false,
+        slots: player.slots,
+        color: player.color,
+      };
+    });
   }
 
   //   getNextId() {

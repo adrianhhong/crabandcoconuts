@@ -137,7 +137,9 @@ export default {
       this.$router.push('/');
     },
     onStartGame: function () {
-      this.$emit('update:currentView', 'Game');
+      this.$socket.client.emit('roomStart', {
+        roomId: this.roomId,
+      });
     },
   },
   sockets: {
@@ -149,6 +151,9 @@ export default {
       if (usernames instanceof Array) {
         this.usernames = usernames;
       }
+    },
+    startGame: function () {
+      this.$emit('update:currentView', 'Game');
     },
   },
   computed: mapState(['username', 'roomId']),

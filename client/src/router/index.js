@@ -8,7 +8,8 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../components/Game/Game.vue'), // WARNING: ONly for testing. Change back to Home later.
+    component: () => import('../views/Home.vue'),
+    // component: () => import('../components/Game/Game.vue'), // WARNING: ONly for testing. Change back to Home later.
   },
   {
     path: '/:roomId',

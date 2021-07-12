@@ -3,10 +3,10 @@ import { GameType, RoomType } from '../types';
 import logger from '../lib/logger';
 
 /**
- * GameState holds all the room info
+ * Game holds all the room info
  *
  */
-export default class GameState {
+export default class Game {
   rooms: Room[] = [];
   io = {} as GameType['io']; // TODO: instantiate properly
 

@@ -19,4 +19,13 @@ export interface PlayerType {
   username: string;
   socket: Socket;
   isHost: boolean;
+  slots: number[];
+  color: string;
+}
+
+export interface PlayerButtonState {
+  player: string;
+  turnIndicator: boolean;
+  slots: number[];
+  color: string;
 }

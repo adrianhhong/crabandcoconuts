@@ -3,7 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 
 import { server as serverConfig } from './config';
-import GameState from './services/game';
+import Game from './services/game';
 import logger from './lib/logger';
 
 // Start express server
@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-const skull = new GameState(io);
+const skull = new Game(io);
 
 io.on('connection', async (socket: Socket) => {
   logger.info(`New connection: ${socket.id}`);
@@ -80,6 +80,11 @@ io.on('connection', async (socket: Socket) => {
       foundRoom?.removePlayer(username);
     }
     foundRoom?.emitUpdatedPlayerList();
+  });
+
+  socket.on('roomStart', ({ roomId }) => {
+    const foundRoom = skull.findRoom(roomId);
+    foundRoom?.startGame();
   });
 });
 

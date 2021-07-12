@@ -3,33 +3,38 @@
     <v-container class="text-center" style="max-width: 600px">
       <v-data-table
         :headers="headers"
-        :items="items"
+        :items="gameState"
         hide-default-header
         hide-default-footer
         class="elevation-1"
       >
+        <template v-slot:[`item.turnIndicator`]="{ item }">
+          <v-icon v-if="item.turnIndicator">
+            mdi-arrow-left-bold
+          </v-icon>
+        </template>
         <template v-slot:[`item.slot1`]="{ item }">
-          <GameSlotCards
-            :slotButton="item.slot1"
-            :slotColor="item.color"
+          <GameButtons
+            :buttonType="item.slots[0]"
+            :buttonColor="item.color"
           />
         </template>
         <template v-slot:[`item.slot2`]="{ item }">
-          <GameSlotCards
-            :slotButton="item.slot2"
-            :slotColor="item.color"
+          <GameButtons
+            :buttonType="item.slots[1]"
+            :buttonColor="item.color"
           />
         </template>
         <template v-slot:[`item.slot3`]="{ item }">
-          <GameSlotCards
-            :slotButton="item.slot3"
-            :slotColor="item.color"
+          <GameButtons
+            :buttonType="item.slots[2]"
+            :buttonColor="item.color"
           />
         </template>
         <template v-slot:[`item.slot4`]="{ item }">
-          <GameSlotCards
-            :slotButton="item.slot4"
-            :slotColor="item.color"
+          <GameButtons
+            :buttonType="item.slots[3]"
+            :buttonColor="item.color"
           />
         </template>
       </v-data-table>
@@ -38,65 +43,26 @@
 </template>
 
 <script>
-import GameSlotCards from './GameSlotCards.vue';
+import GameButtons from './GameButtons.vue';
+import { mapState } from 'vuex';
 export default {
   name: 'Game',
   components: {
-    GameSlotCards,
+    GameButtons,
   },
   data: () => {
     return {
       headers: [
         { value: 'player' },
+        { value: 'turnIndicator' },
         { value: 'slot1' },
         { value: 'slot2' },
         { value: 'slot3' },
         { value: 'slot4' },
       ],
-      items: [
-        {
-          player: 'memelord',
-          slot1: 'faceup-skull',
-          slot2: 'faceup-rose',
-          slot3: 'empty',
-          slot4: 'clickable',
-          color: 'red',
-        },
-        {
-          player: 'plater2',
-          slot1: 'facedown',
-          slot2: 'disabled',
-          slot3: 'zzz',
-          slot4: 'clickable',
-          color: 'green',
-        },
-        {
-          player: 'memelord',
-          slot1: 'faceup-skull',
-          slot2: 'faceup-rose',
-          slot3: 'empty',
-          slot4: 'clickable',
-          color: 'blue',
-        },
-        {
-          player: 'memelord',
-          slot1: 'faceup-skull',
-          slot2: 'faceup-rose',
-          slot3: 'empty',
-          slot4: 'clickable',
-          color: 'orange',
-        },
-        {
-          player: 'memelord',
-          slot1: 'faceup-skull',
-          slot2: 'faceup-rose',
-          slot3: 'empty',
-          slot4: 'clickable',
-          color: 'pink',
-        },
-      ],
     };
   },
+  computed: mapState(['gameState', 'activePlayer']),
 };
 </script>
 
