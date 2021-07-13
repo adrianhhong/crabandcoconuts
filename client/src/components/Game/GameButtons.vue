@@ -6,6 +6,7 @@
         :outlined="changeButton(buttonType).isOutlined"
         :color="buttonColor"
         class="disable-button"
+        small
       >
         <v-icon>{{ changeButton(buttonType).icon }}</v-icon>
       </v-btn>

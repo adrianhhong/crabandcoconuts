@@ -4,4 +4,4 @@ export const server = {
   logLevel: 'debug',
 };
 
-export const colors = ['red', 'green', 'blue', 'yellow', 'orange'];
+export const colors = ['orange', 'green', 'blue', 'yellow', 'red'];

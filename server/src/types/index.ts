@@ -21,6 +21,7 @@ export interface PlayerType {
   isHost: boolean;
   slots: number[];
   color: string;
+  points: number;
 }
 
 export interface PlayerButtonState {

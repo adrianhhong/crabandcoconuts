@@ -8,7 +8,8 @@ export default new Vuex.Store({
     username: '',
     roomId: '',
     hostUsername: '',
-    gameState: [],
+    gameState: '',
+    playerStates: [],
     activePlayer: '',
   },
   mutations: {
@@ -18,6 +19,7 @@ export default new Vuex.Store({
     },
     SOCKET_UPDATEGAMESTATE(state, payload) {
       state.gameState = payload.gameState;
+      state.playerStates = payload.playerStates;
       state.activePlayer = payload.activePlayer;
     },
   },

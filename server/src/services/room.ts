@@ -137,12 +137,13 @@ export default class Room {
     this.activePlayer = this.players[randomPlayerIndex].username;
     this.io.in(this.roomId).emit('startGame');
     this.io.in(this.roomId).emit('updateGameState', {
-      gameState: this.getGameState(),
+      gameState: 'turnOne',
+      playerStates: this.getPlayerStates(),
       activePlayer: this.activePlayer,
     });
   }
 
-  getGameState(): PlayerButtonState[] {
+  getPlayerStates(): PlayerButtonState[] {
     return this.players.map((player) => {
       return {
         player: player.username,
@@ -150,6 +151,7 @@ export default class Room {
           player.username === this.activePlayer ? true : false,
         slots: player.slots,
         color: player.color,
+        points: player.points,
       };
     });
   }

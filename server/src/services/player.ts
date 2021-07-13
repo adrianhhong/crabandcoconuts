@@ -14,6 +14,7 @@ export default class Player {
    */
   slots: PlayerType['slots'] = [0, 0, 0, 0];
   color: PlayerType['color'];
+  points: PlayerType['points'] = 0;
 
   constructor(
     username: PlayerType['username'],
