@@ -14,6 +14,7 @@ export default new Vuex.Store({
     round: 0,
     playerStates: [],
     activePlayer: '',
+    cardsPlayed: 0,
   },
   mutations: {
     mutatePlayerDetails(state, payload) {
@@ -27,6 +28,7 @@ export default new Vuex.Store({
       state.round = payload.round;
       state.playerStates = payload.playerStates;
       state.activePlayer = payload.activePlayer;
+      state.cardsPlayed = payload.cardsPlayed;
     },
   },
   actions: {},

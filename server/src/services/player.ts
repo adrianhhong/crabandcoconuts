@@ -3,7 +3,6 @@ import { PlayerType } from '../types';
 export default class Player {
   username: PlayerType['username'] = '';
   socket: PlayerType['socket'];
-  isHost: PlayerType['isHost'] = false;
   /**
    * 0: empty: Slot with no card on it
    * 1: faceup-skull
@@ -21,7 +20,9 @@ export default class Player {
    */
   hiddenSlots: PlayerType['slots'] = [0, 0, 0, 0];
   color: PlayerType['color'];
-  points: PlayerType['points'] = 0;
+  points: PlayerType['points'] = 0; // number of rounds won
+  numberOfSkulls: PlayerType['numberOfSkulls'] = 1; // number of skulls left
+  numberOfRoses: PlayerType['numberOfRoses'] = 3; // number of skulls left
 
   constructor(
     username: PlayerType['username'],
@@ -31,9 +32,5 @@ export default class Player {
     this.username = username;
     this.socket = socket;
     this.color = color;
-  }
-
-  makeHost(): void {
-    this.isHost = true;
   }
 }

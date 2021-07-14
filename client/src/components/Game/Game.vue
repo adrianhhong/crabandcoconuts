@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-container class="text-center" style="max-width: 600px">
+      <!-- Messages -->
       <v-card height="180" class="my-4">
         <v-card-title>
           <span v-html="currentMessage"></span>
@@ -15,6 +16,7 @@
           </div>
         </v-card-text>
       </v-card>
+      <!-- Game Slots -->
       <v-simple-table>
         <template v-slot:default>
           <tbody>
@@ -52,24 +54,29 @@
           </tbody>
         </template>
       </v-simple-table>
-      <v-container class="my-4">
+      <!-- Buttons -->
+      <v-container class="my-4" v-if="bidMode === false">
         <v-row>
           <v-col col="6">
             <v-btn
               block
-              :disabled="username !== activePlayer"
+              :disabled="
+                username !== activePlayer || numberOfRoses === 0
+              "
               @click="playCard('rose')"
             >
-              Play Rose
+              Play Rose ({{ numberOfRoses }})
             </v-btn>
           </v-col>
           <v-col col="6">
             <v-btn
               block
-              :disabled="username !== activePlayer"
+              :disabled="
+                username !== activePlayer || numberOfSkulls === 0
+              "
               @click="playCard('skull')"
             >
-              Play Skull
+              Play Skull ({{ numberOfSkulls }})
             </v-btn>
           </v-col>
         </v-row>
@@ -77,15 +84,16 @@
           <v-col>
             <v-btn
               block
-              :disabled="round === 0 && username !== activePlayer"
+              :disabled="round === 0 || username !== activePlayer"
+              @click="bidMode = true"
             >
               Challenge
             </v-btn>
           </v-col>
         </v-row>
       </v-container>
-      <v-container>
-        <v-row v-if="bidMode">
+      <v-container v-if="bidMode">
+        <v-row>
           <v-col>
             <v-slider
               v-model="challengeNumber"
@@ -93,7 +101,7 @@
               ticks="always"
               always-dirty
               min="1"
-              max="10"
+              :max="cardsPlayed"
               thumb-label="always"
             >
               <template v-slot:prepend>
@@ -108,15 +116,15 @@
             </v-slider>
           </v-col>
         </v-row>
-        <v-row v-if="bidMode">
+        <v-row>
           <v-col>
             <v-btn block> Confirm </v-btn>
           </v-col>
           <v-col>
-            <v-btn block> Back </v-btn>
+            <v-btn block @click="bidMode = false"> Back </v-btn>
           </v-col>
         </v-row>
-        <v-row v-if="bidMode">
+        <v-row>
           <v-col>
             <v-btn block> Raise </v-btn>
           </v-col>
@@ -142,6 +150,8 @@ export default {
       challengeNumber: 1,
       messageLog: [],
       bidMode: false,
+      numberOfSkulls: 0,
+      numberOfRoses: 0,
     };
   },
   computed: {
@@ -153,11 +163,19 @@ export default {
       'round',
       'playerStates',
       'activePlayer',
+      'cardsPlayed',
     ]),
   },
   watch: {
     addedLogMessage(newAddedLogMessage) {
       this.messageLog.unshift(newAddedLogMessage);
+    },
+    playerStates(newPlayerStates) {
+      const userPlayerState = newPlayerStates.find(
+        (playerState) => playerState.player === this.username,
+      );
+      this.numberOfSkulls = userPlayerState.numberOfSkulls;
+      this.numberOfRoses = userPlayerState.numberOfRoses;
     },
   },
   methods: {

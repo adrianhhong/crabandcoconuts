@@ -18,10 +18,11 @@ export interface RoomType {
 export interface PlayerType {
   username: string;
   socket: Socket;
-  isHost: boolean;
   slots: number[];
   color: string;
   points: number;
+  numberOfSkulls: number;
+  numberOfRoses: number;
 }
 
 export interface PlayerButtonState {
