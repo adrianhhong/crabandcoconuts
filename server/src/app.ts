@@ -89,11 +89,11 @@ io.on('connection', async (socket: Socket) => {
 });
 
 server.listen(serverConfig.socketPort, () => {
-  logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
+  // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
 
 app.listen(serverConfig.apiPort, () => {
-  logger.info(`Api listening on port ${serverConfig.apiPort}!`);
+  // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
 });
 
 // app.use('/', function (req, res, next) {

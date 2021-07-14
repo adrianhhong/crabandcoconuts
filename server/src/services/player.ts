@@ -13,6 +13,13 @@ export default class Player {
    * 5: disabled: Player has less than 4 cards, and so a certain number of slots will be disabled
    */
   slots: PlayerType['slots'] = [0, 0, 0, 0];
+
+  /**
+   * 0: nothing
+   * 1: skull
+   * 2: rose
+   */
+  hiddenSlots: PlayerType['slots'] = [0, 0, 0, 0];
   color: PlayerType['color'];
   points: PlayerType['points'] = 0;
 

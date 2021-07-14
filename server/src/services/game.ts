@@ -48,7 +48,7 @@ export default class Game {
           Math.floor(Math.random() * alphabet.length),
         );
       }
-      //make sure the code is not already in use
+      // make sure the code is not already in use
     } while (this.findRoom(code));
     return code;
   }

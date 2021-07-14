@@ -2,12 +2,17 @@
   <div>
     <v-container class="text-center" style="max-width: 600px">
       <v-card height="180" class="my-4">
-        <v-card-title> {{ currentMessage }} </v-card-title>
+        <v-card-title>
+          <span v-html="currentMessage"></span>
+        </v-card-title>
         <v-card-text
           style="max-height: 105px; overflow-y: auto"
           class="text-left"
         >
-          {{ previousMessages }}
+          <div v-for="(message, index) in messageLog" :key="index">
+            <span v-html="message"></span>
+            <br />
+          </div>
         </v-card-text>
       </v-card>
       <v-simple-table>
@@ -50,22 +55,37 @@
       <v-container class="my-4">
         <v-row>
           <v-col col="6">
-            <v-btn block> Play Rose </v-btn>
+            <v-btn
+              block
+              :disabled="username !== activePlayer"
+              @click="playCard('rose')"
+            >
+              Play Rose
+            </v-btn>
           </v-col>
           <v-col col="6">
-            <v-btn block> Play Skull </v-btn>
+            <v-btn
+              block
+              :disabled="username !== activePlayer"
+              @click="playCard('skull')"
+            >
+              Play Skull
+            </v-btn>
           </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <v-btn block :disabled="gameState !== 'subsequentTurn'">
+            <v-btn
+              block
+              :disabled="round === 0 && username !== activePlayer"
+            >
               Challenge
             </v-btn>
           </v-col>
         </v-row>
       </v-container>
       <v-container>
-        <v-row>
+        <v-row v-if="bidMode">
           <v-col>
             <v-slider
               v-model="challengeNumber"
@@ -88,7 +108,7 @@
             </v-slider>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="bidMode">
           <v-col>
             <v-btn block> Confirm </v-btn>
           </v-col>
@@ -96,7 +116,7 @@
             <v-btn block> Back </v-btn>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="bidMode">
           <v-col>
             <v-btn block> Raise </v-btn>
           </v-col>
@@ -120,16 +140,31 @@ export default {
   data: () => {
     return {
       challengeNumber: 1,
-      currentMessage: '',
-      previousMessages: '',
+      messageLog: [],
+      bidMode: false,
     };
   },
   computed: {
-    ...mapState(['gameState', 'playerStates', 'activePlayer']),
+    ...mapState([
+      'username',
+      'currentMessage',
+      'addedLogMessage',
+      'gameState',
+      'round',
+      'playerStates',
+      'activePlayer',
+    ]),
   },
   watch: {
-    activePlayer(newActivePlayer, oldActivePlayer) {
-      this.currentMessage = `${newActivePlayer}'s turn to play a card.`;
+    addedLogMessage(newAddedLogMessage) {
+      this.messageLog.unshift(newAddedLogMessage);
+    },
+  },
+  methods: {
+    playCard: function (cardType) {
+      this.$socket.client.emit('playCard', {
+        card: cardType,
+      });
     },
   },
 };

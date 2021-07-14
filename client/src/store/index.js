@@ -8,7 +8,10 @@ export default new Vuex.Store({
     username: '',
     roomId: '',
     hostUsername: '',
+    currentMessage: '',
+    addedLogMessage: '',
     gameState: '',
+    round: 0,
     playerStates: [],
     activePlayer: '',
   },
@@ -18,7 +21,10 @@ export default new Vuex.Store({
       state.roomId = payload.roomId;
     },
     SOCKET_UPDATEGAMESTATE(state, payload) {
+      state.currentMessage = payload.currentMessage;
+      state.addedLogMessage = payload.addedLogMessage;
       state.gameState = payload.gameState;
+      state.round = payload.round;
       state.playerStates = payload.playerStates;
       state.activePlayer = payload.activePlayer;
     },

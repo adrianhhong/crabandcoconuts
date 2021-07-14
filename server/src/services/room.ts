@@ -9,7 +9,8 @@ export default class Room {
   roomId: RoomType['roomId'];
   host = {} as RoomType['host']; // TODO: Fix this instantiating, {} isnt the same as an instance of the class
   onEmpty: RoomType['onEmpty'];
-  activePlayer = '';
+  round = 0;
+  activePlayerIndex = 0;
 
   constructor(
     io: RoomType['io'],
@@ -52,13 +53,64 @@ export default class Room {
         `${username} is now the host of rooom: ${this.roomId}`,
       );
     }
-    // remove player from game on disconnect
+    this.setPlayerSockets(newPlayer);
+    this.players.push(newPlayer);
+    return newPlayer;
+  }
+
+  setPlayerSockets(newPlayer: Player): void {
+    /**
+     * disconnect: When a player disconnects, remove player from room
+     */
     newPlayer.socket.on('disconnect', () => {
+      logger.info(`${newPlayer.username} disconnected`);
       this.removePlayer(newPlayer.username);
       this.emitUpdatedPlayerList();
     });
-    this.players.push(newPlayer);
-    return newPlayer;
+    /**
+     * playCard: When a player plays a card (skull or rose) update their hiddenSlots and slots
+     */
+    newPlayer.socket.on('playCard', ({ card }) => {
+      // Set hiddenSlots
+      if (card === 'skull') {
+        this.players[this.activePlayerIndex].hiddenSlots[
+          this.round
+        ] = 1;
+      }
+      if (card === 'rose') {
+        this.players[this.activePlayerIndex].hiddenSlots[
+          this.round
+        ] = 2;
+      }
+      // Set slots
+      this.players[this.activePlayerIndex].slots[this.round] = 3;
+      const previousActivePlayer =
+        this.players[this.activePlayerIndex].username;
+      const previousRound = this.round;
+      const previousColor =
+        this.players[this.activePlayerIndex].color;
+      // Increment round and activePlayerIndex
+      if (this.activePlayerIndex === this.players.length - 1) {
+        this.round++;
+        this.activePlayerIndex = 0;
+      } else {
+        this.activePlayerIndex++;
+      }
+      const activePlayer =
+        this.players[this.activePlayerIndex].username;
+      const activeColor = this.players[this.activePlayerIndex].color;
+      // Update game state
+      this.io.in(this.roomId).emit('updateGameState', {
+        currentMessage: `<span style="color:${activeColor}";>${activePlayer}</span>'s turn`,
+        addedLogMessage: `<span style="color:${previousColor}";>${previousActivePlayer}</span> placed down card ${
+          previousRound + 1
+        } `,
+        gameState: 'placingCards',
+        round: this.round,
+        playerStates: this.getPlayerStates(),
+        activePlayer: activePlayer,
+      });
+    });
   }
 
   emitUpdatedPlayerList(): void {
@@ -131,15 +183,17 @@ export default class Room {
   }
 
   startGame(): void {
-    const randomPlayerIndex = Math.floor(
-      Math.random() * this.players.length,
-    );
-    this.activePlayer = this.players[randomPlayerIndex].username;
     this.io.in(this.roomId).emit('startGame');
+    const activePlayer =
+      this.players[this.activePlayerIndex].username;
+    const activeColor = this.players[this.activePlayerIndex].color;
     this.io.in(this.roomId).emit('updateGameState', {
-      gameState: 'turnOne',
+      currentMessage: `<span style="color:${activeColor}";>${activePlayer}</span>'s turn`,
+      addedLogMessage: `<span style="color:white>";>Round 1! 🎉</span>`,
+      gameState: 'placingCards',
+      round: this.round,
       playerStates: this.getPlayerStates(),
-      activePlayer: this.activePlayer,
+      activePlayer: activePlayer,
     });
   }
 
@@ -147,64 +201,10 @@ export default class Room {
     return this.players.map((player) => {
       return {
         player: player.username,
-        turnIndicator:
-          player.username === this.activePlayer ? true : false,
         slots: player.slots,
         color: player.color,
         points: player.points,
       };
     });
   }
-
-  //   getNextId() {
-  //     return this.currentId++;
-  //   }
-  //   getNextRoundNum() {
-  //     return this.currentRoundNum++;
-  //   }
-  //   getJsonGame() {
-  //     const players = [];
-  //     this.players.forEach((player) => {
-  //       players.push(player.getJson());
-  //     });
-  //     const jsonGame = {
-  //       code: this.code,
-  //       players,
-  //       inProgress: this.inProgress,
-  //       canViewLastRoundResults:
-  //         this.currentRound !== undefined &&
-  //         this.currentRound.canViewLastRoundResults,
-  //     };
-  //     return jsonGame;
-  //   }
-
-  //   sendToAll(event, data) {
-  //     this.players.forEach((player) => {
-  //       player.socket.emit(event, {
-  //         success: true,
-  //         event,
-  //         gameCode: this.code,
-  //         player: player.getJson(),
-  //         data,
-  //       });
-  //     });
-  //   }
-  //   startNewRound(timeLimit, wordPackName, showNeighbors, turnLimit) {
-  //     this.inProgress = true;
-  //     this.currentRound = new Round(
-  //       this.getNextRoundNum(),
-  //       this.players,
-  //       timeLimit,
-  //       wordPackName,
-  //       showNeighbors,
-  //       turnLimit,
-  //       () => {
-  //         //ran when results are sent
-  //         this.inProgress = false;
-  //         this.sendUpdatedPlayersList(); //this makes sure the View Last Round Results button shows up
-  //         this.timeOfLastAction = new Date();
-  //       },
-  //     );
-  //     this.currentRound.start();
-  //   }
 }

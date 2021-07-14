@@ -26,7 +26,6 @@ export interface PlayerType {
 
 export interface PlayerButtonState {
   player: string;
-  turnIndicator: boolean;
   slots: number[];
   color: string;
 }
