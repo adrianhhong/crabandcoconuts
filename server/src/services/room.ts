@@ -1,5 +1,10 @@
 import Player from './player';
-import { RoomType, PlayerType, PlayerButtonState } from '../types';
+import {
+  RoomType,
+  PlayerType,
+  PlayerButtonState,
+  ActiveDetails,
+} from '../types';
 import logger from '../lib/logger';
 import { colors } from '../config';
 
@@ -10,8 +15,12 @@ export default class Room {
   host = {} as RoomType['host']; // TODO: Fix this instantiating, {} isnt the same as an instance of the class
   onEmpty: RoomType['onEmpty'];
   round = 0;
-  activePlayerIndex = 0;
+  startingPlayerIndex = 0; // Index of player who started the round
+  activePlayerIndex = 0; // Index of active player
   cardsPlayed = 0;
+  currentBidNumber = 0;
+  currentBidder = '';
+  passedBid: RoomType['passedBid'] = [];
 
   constructor(
     io: RoomType['io'],
@@ -73,34 +82,120 @@ export default class Room {
       }
       // Set slots
       this.players[this.activePlayerIndex].slots[this.round] = 3;
-      const previousActivePlayer =
-        this.players[this.activePlayerIndex].username;
-      const previousRound = this.round;
-      const previousColor =
-        this.players[this.activePlayerIndex].color;
-      // Increment round and activePlayerIndex
-      if (this.activePlayerIndex === this.players.length - 1) {
+      // Record previous variables
+      const previous = this.getActiveDetails();
+      // Increase cardsPlayed
+      this.cardsPlayed++;
+      // Check if round has increased
+      if (this.cardsPlayed % this.players.length === 0) {
         this.round++;
+      }
+      this.increaseActivePlayerIndex();
+      const current = this.getActiveDetails();
+      // Update game state
+      this.io.in(this.roomId).emit('updateGameState', {
+        currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn`,
+        addedLogMessage: `<span style="color:${previous.color}";>${
+          previous.player
+        }</span> placed down card ${previous.round + 1} 🤫`,
+        gameState: 'placingCards',
+        round: this.round,
+        biddingMinimum: 1, // Not really using this yet
+        playerStates: this.getPlayerStates(),
+        activePlayer: current.player,
+        cardsPlayed: this.cardsPlayed,
+      });
+    });
+    /**
+     * raiseBid: When a player submits an initial bid
+     */
+    newPlayer.socket.on('raiseBid', ({ bidNumber }) => {
+      this.currentBidNumber = bidNumber;
+      this.currentBidder = newPlayer.username;
+      const previous = this.getActiveDetails();
+      if (this.currentBidNumber === this.cardsPlayed) {
+        this.io.in(this.roomId).emit('updateGameState', {
+          currentMessage: `<span style="color:${previous.color}";>${previous.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards 🤔`,
+          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards ☝️`,
+          gameState: 'flippingCards',
+          round: this.round,
+          biddingMinimum: this.currentBidNumber + 1,
+          playerStates: this.getPlayerStates(),
+          activePlayer: previous.player,
+          cardsPlayed: this.cardsPlayed,
+        });
+      } else {
+        this.increaseActivePlayerIndex();
+        const current = this.getActiveDetails();
+        this.io.in(this.roomId).emit('updateGameState', {
+          currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn to increase the bid or pass`,
+          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards ☝️`,
+          gameState: 'bidding',
+          round: this.round,
+          biddingMinimum: this.currentBidNumber + 1,
+          playerStates: this.getPlayerStates(),
+          activePlayer: current.player,
+          cardsPlayed: this.cardsPlayed,
+        });
+      }
+    });
+    /**
+     * passBid TODO: FIX UP NOT WORKING
+     */
+    newPlayer.socket.on('passBid', () => {
+      this.passedBid[this.activePlayerIndex] = 1;
+      const previous = this.getActiveDetails();
+      const allPlayersPassed = this.increaseActivePlayerIndex();
+      const current = this.getActiveDetails();
+      if (allPlayersPassed) {
+        this.io.in(this.roomId).emit('updateGameState', {
+          currentMessage: `<span style="color:${current.color}";>${current.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards 🤔`,
+          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> passed their bid 😬`,
+          gameState: 'flippingCards',
+          round: this.round,
+          biddingMinimum: this.currentBidNumber + 1,
+          playerStates: this.getPlayerStates(),
+          activePlayer: current.player,
+          cardsPlayed: this.cardsPlayed,
+        });
+      } else {
+        this.io.in(this.roomId).emit('updateGameState', {
+          currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn to increase the bid or pass`,
+          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> passed their bid 😬`,
+          gameState: 'bidding',
+          round: this.round,
+          biddingMinimum: this.currentBidNumber + 1,
+          playerStates: this.getPlayerStates(),
+          activePlayer: current.player,
+          cardsPlayed: this.cardsPlayed,
+        });
+      }
+    });
+  }
+
+  getActiveDetails(): ActiveDetails {
+    return {
+      color: this.players[this.activePlayerIndex].color,
+      player: this.players[this.activePlayerIndex].username,
+      round: this.round,
+    };
+  }
+
+  // return true if everyone passed and we want to go to challenge mode
+  increaseActivePlayerIndex(): boolean {
+    let numberOfPassedPlayers = 0;
+    do {
+      if (this.activePlayerIndex === this.players.length - 1) {
         this.activePlayerIndex = 0;
       } else {
         this.activePlayerIndex++;
       }
-      const activePlayer =
-        this.players[this.activePlayerIndex].username;
-      const activeColor = this.players[this.activePlayerIndex].color;
-      // Update game state
-      this.io.in(this.roomId).emit('updateGameState', {
-        currentMessage: `<span style="color:${activeColor}";>${activePlayer}</span>'s turn`,
-        addedLogMessage: `<span style="color:${previousColor}";>${previousActivePlayer}</span> placed down card ${
-          previousRound + 1
-        } `,
-        gameState: 'placingCards',
-        round: this.round,
-        playerStates: this.getPlayerStates(),
-        activePlayer: activePlayer,
-        cardsPlayed: ++this.cardsPlayed,
-      });
-    });
+      if (++numberOfPassedPlayers === this.players.length - 1) {
+        // we went through everyone and they all passed...
+        return true;
+      }
+    } while (this.passedBid[this.activePlayerIndex] === 1);
+    return false;
   }
 
   emitUpdatedPlayerList(): void {
@@ -173,14 +268,20 @@ export default class Room {
 
   startGame(): void {
     this.io.in(this.roomId).emit('startGame');
+    this.passedBid = new Array(this.players.length).fill(0);
+    this.startingPlayerIndex = Math.floor(
+      Math.random() * this.players.length,
+    );
+    this.activePlayerIndex = this.startingPlayerIndex;
     const activePlayer =
       this.players[this.activePlayerIndex].username;
     const activeColor = this.players[this.activePlayerIndex].color;
     this.io.in(this.roomId).emit('updateGameState', {
       currentMessage: `<span style="color:${activeColor}";>${activePlayer}</span>'s turn`,
-      addedLogMessage: `<span style="color:white>";>Round 1! 🎉</span>`,
+      addedLogMessage: `Round 1! 🎉`,
       gameState: 'placingCards',
       round: this.round,
+      biddingMinimum: 1, // Not really using this yet
       playerStates: this.getPlayerStates(),
       activePlayer: activePlayer,
       cardsPlayed: this.cardsPlayed,
@@ -190,7 +291,7 @@ export default class Room {
   getPlayerStates(): PlayerButtonState[] {
     return this.players.map((player) => {
       return {
-        player: player.username,
+        username: player.username,
         slots: player.slots,
         color: player.color,
         points: player.points,

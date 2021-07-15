@@ -13,6 +13,7 @@ export interface RoomType {
   roomId: string;
   host: Player;
   onEmpty: () => void;
+  passedBid: number[];
 }
 
 export interface PlayerType {
@@ -26,7 +27,16 @@ export interface PlayerType {
 }
 
 export interface PlayerButtonState {
-  player: string;
+  username: string;
   slots: number[];
   color: string;
+  points: number;
+  numberOfSkulls: number;
+  numberOfRoses: number;
+}
+
+export interface ActiveDetails {
+  color: string;
+  player: string;
+  round: number;
 }

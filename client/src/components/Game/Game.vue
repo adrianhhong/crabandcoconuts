@@ -55,7 +55,13 @@
         </template>
       </v-simple-table>
       <!-- Buttons -->
-      <v-container class="my-4" v-if="bidMode === false">
+      <v-container
+        class="my-4"
+        v-if="
+          initiateBiddingMode === false &&
+          gameState === 'placingCards'
+        "
+      >
         <v-row>
           <v-col col="6">
             <v-btn
@@ -85,51 +91,64 @@
             <v-btn
               block
               :disabled="round === 0 || username !== activePlayer"
-              @click="bidMode = true"
+              @click="initiateBiddingMode = true"
             >
               Challenge
             </v-btn>
           </v-col>
         </v-row>
       </v-container>
-      <v-container v-if="bidMode">
-        <v-row>
-          <v-col>
+      <v-container>
+        <v-row v-if="initiateBiddingMode || gameState === 'bidding'">
+          <v-col class="pt-13">
             <v-slider
-              v-model="challengeNumber"
+              v-model="bidNumber"
               track-color="grey"
               ticks="always"
-              always-dirty
-              min="1"
+              tick-size="7"
+              :min="biddingMinimum"
               :max="cardsPlayed"
               thumb-label="always"
+              :disabled="username !== activePlayer"
             >
               <template v-slot:prepend>
-                <v-icon @click="challengeNumber--">
-                  mdi-minus
-                </v-icon>
+                <v-icon @click="bidNumber--"> mdi-minus </v-icon>
               </template>
 
               <template v-slot:append>
-                <v-icon @click="challengeNumber++"> mdi-plus </v-icon>
+                <v-icon @click="bidNumber++"> mdi-plus </v-icon>
               </template>
             </v-slider>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="initiateBiddingMode">
           <v-col>
-            <v-btn block> Confirm </v-btn>
+            <v-btn block @click="confirmBid"> Confirm </v-btn>
           </v-col>
           <v-col>
-            <v-btn block @click="bidMode = false"> Back </v-btn>
+            <v-btn block @click="initiateBiddingMode = false">
+              Back
+            </v-btn>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="gameState === 'bidding'">
           <v-col>
-            <v-btn block> Raise </v-btn>
+            <v-btn
+              block
+              :disabled="username !== activePlayer"
+              @click="confirmBid"
+            >
+              Raise
+            </v-btn>
           </v-col>
           <v-col>
-            <v-btn block> Pass </v-btn>
+            <v-btn
+              block
+              :disabled="username !== activePlayer"
+              @click="passBid"
+            >
+              Pass
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -147,9 +166,9 @@ export default {
   },
   data: () => {
     return {
-      challengeNumber: 1,
+      bidNumber: 1,
       messageLog: [],
-      bidMode: false,
+      initiateBiddingMode: false,
       numberOfSkulls: 0,
       numberOfRoses: 0,
     };
@@ -161,6 +180,7 @@ export default {
       'addedLogMessage',
       'gameState',
       'round',
+      'biddingMinimum',
       'playerStates',
       'activePlayer',
       'cardsPlayed',
@@ -172,7 +192,7 @@ export default {
     },
     playerStates(newPlayerStates) {
       const userPlayerState = newPlayerStates.find(
-        (playerState) => playerState.player === this.username,
+        (playerState) => playerState.username === this.username,
       );
       this.numberOfSkulls = userPlayerState.numberOfSkulls;
       this.numberOfRoses = userPlayerState.numberOfRoses;
@@ -183,6 +203,15 @@ export default {
       this.$socket.client.emit('playCard', {
         card: cardType,
       });
+    },
+    confirmBid: function () {
+      this.$socket.client.emit('raiseBid', {
+        bidNumber: this.bidNumber,
+      });
+      this.initiateBiddingMode = false;
+    },
+    passBid: function () {
+      this.$socket.client.emit('passBid');
     },
   },
 };

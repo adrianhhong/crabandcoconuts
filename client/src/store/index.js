@@ -12,6 +12,7 @@ export default new Vuex.Store({
     addedLogMessage: '',
     gameState: '',
     round: 0,
+    biddingMinimum: 1,
     playerStates: [],
     activePlayer: '',
     cardsPlayed: 0,
@@ -26,6 +27,7 @@ export default new Vuex.Store({
       state.addedLogMessage = payload.addedLogMessage;
       state.gameState = payload.gameState;
       state.round = payload.round;
+      state.biddingMinimum = payload.biddingMinimum;
       state.playerStates = payload.playerStates;
       state.activePlayer = payload.activePlayer;
       state.cardsPlayed = payload.cardsPlayed;
