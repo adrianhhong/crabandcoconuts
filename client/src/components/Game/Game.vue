@@ -59,7 +59,7 @@
         class="my-4"
         v-if="
           initiateBiddingMode === false &&
-          gameState === 'placingCards'
+          gamePhase === 'placingCards'
         "
       >
         <v-row>
@@ -99,7 +99,7 @@
         </v-row>
       </v-container>
       <v-container>
-        <v-row v-if="initiateBiddingMode || gameState === 'bidding'">
+        <v-row v-if="initiateBiddingMode || gamePhase === 'bidding'">
           <v-col class="pt-13">
             <v-slider
               v-model="bidNumber"
@@ -131,7 +131,7 @@
             </v-btn>
           </v-col>
         </v-row>
-        <v-row v-if="gameState === 'bidding'">
+        <v-row v-if="gamePhase === 'bidding'">
           <v-col>
             <v-btn
               block
@@ -178,7 +178,7 @@ export default {
       'username',
       'currentMessage',
       'addedLogMessage',
-      'gameState',
+      'gamePhase',
       'round',
       'biddingMinimum',
       'playerStates',

@@ -10,7 +10,7 @@ export default new Vuex.Store({
     hostUsername: '',
     currentMessage: '',
     addedLogMessage: '',
-    gameState: '',
+    gamePhase: '',
     round: 0,
     biddingMinimum: 1,
     playerStates: [],
@@ -25,7 +25,7 @@ export default new Vuex.Store({
     SOCKET_UPDATEGAMESTATE(state, payload) {
       state.currentMessage = payload.currentMessage;
       state.addedLogMessage = payload.addedLogMessage;
-      state.gameState = payload.gameState;
+      state.gamePhase = payload.gamePhase;
       state.round = payload.round;
       state.biddingMinimum = payload.biddingMinimum;
       state.playerStates = payload.playerStates;

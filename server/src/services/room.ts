@@ -98,7 +98,7 @@ export default class Room {
         addedLogMessage: `<span style="color:${previous.color}";>${
           previous.player
         }</span> placed down card ${previous.round + 1} 🤫`,
-        gameState: 'placingCards',
+        gamePhase: 'placingCards',
         round: this.round,
         biddingMinimum: 1, // Not really using this yet
         playerStates: this.getPlayerStates(),
@@ -117,7 +117,7 @@ export default class Room {
         this.io.in(this.roomId).emit('updateGameState', {
           currentMessage: `<span style="color:${previous.color}";>${previous.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards 🤔`,
           addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards ☝️`,
-          gameState: 'flippingCards',
+          gamePhase: 'flippingCards',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -130,7 +130,7 @@ export default class Room {
         this.io.in(this.roomId).emit('updateGameState', {
           currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn to increase the bid or pass`,
           addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards ☝️`,
-          gameState: 'bidding',
+          gamePhase: 'bidding',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -151,7 +151,7 @@ export default class Room {
         this.io.in(this.roomId).emit('updateGameState', {
           currentMessage: `<span style="color:${current.color}";>${current.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards 🤔`,
           addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> passed their bid 😬`,
-          gameState: 'flippingCards',
+          gamePhase: 'flippingCards',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -162,7 +162,7 @@ export default class Room {
         this.io.in(this.roomId).emit('updateGameState', {
           currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn to increase the bid or pass`,
           addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> passed their bid 😬`,
-          gameState: 'bidding',
+          gamePhase: 'bidding',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -279,7 +279,7 @@ export default class Room {
     this.io.in(this.roomId).emit('updateGameState', {
       currentMessage: `<span style="color:${activeColor}";>${activePlayer}</span>'s turn`,
       addedLogMessage: `Round 1! 🎉`,
-      gameState: 'placingCards',
+      gamePhase: 'placingCards',
       round: this.round,
       biddingMinimum: 1, // Not really using this yet
       playerStates: this.getPlayerStates(),
