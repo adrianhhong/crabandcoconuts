@@ -71,7 +71,7 @@ export default class Room {
       if (card === 'skull') {
         this.players[this.activePlayerIndex].hiddenSlots[
           this.round
-        ] = 1;
+        ] = 3;
         this.players[this.activePlayerIndex].numberOfSkulls--;
       }
       if (card === 'rose') {
@@ -81,7 +81,7 @@ export default class Room {
         this.players[this.activePlayerIndex].numberOfRoses--;
       }
       // Set slots
-      this.players[this.activePlayerIndex].slots[this.round] = 3;
+      this.players[this.activePlayerIndex].slots[this.round] = 1;
       // Record previous variables
       const previous = this.getActiveDetails();
       // Increase cardsPlayed
@@ -94,10 +94,10 @@ export default class Room {
       const current = this.getActiveDetails();
       // Update game state
       this.io.in(this.roomId).emit('updateGameState', {
-        currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn`,
-        addedLogMessage: `<span style="color:${previous.color}";>${
+        currentMessage: `<span class="${current.color}--text">${current.player}</span>'s turn`,
+        addedLogMessage: `<span class="${previous.color}--text">${
           previous.player
-        }</span> placed down card ${previous.round + 1} 🤫`,
+        }</span> placed down card ${previous.round + 1}`,
         gamePhase: 'placingCards',
         round: this.round,
         biddingMinimum: 1, // Not really using this yet
@@ -114,10 +114,11 @@ export default class Room {
       this.currentBidder = newPlayer.username;
       const previous = this.getActiveDetails();
       if (this.currentBidNumber === this.cardsPlayed) {
+        this.setupChallenge();
         this.io.in(this.roomId).emit('updateGameState', {
-          currentMessage: `<span style="color:${previous.color}";>${previous.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards 🤔`,
-          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards ☝️`,
-          gamePhase: 'flippingCards',
+          currentMessage: `<span class="${previous.color}--text">${previous.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards`,
+          addedLogMessage: `<span class="${previous.color}--text">${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards`,
+          gamePhase: 'challenge',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -128,9 +129,9 @@ export default class Room {
         this.increaseActivePlayerIndex();
         const current = this.getActiveDetails();
         this.io.in(this.roomId).emit('updateGameState', {
-          currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn to increase the bid or pass`,
-          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards ☝️`,
-          gamePhase: 'bidding',
+          currentMessage: `<span class="${current.color}--text">${current.player}</span>'s turn to increase the bid or pass`,
+          addedLogMessage: `<span class="${previous.color}--text">${previous.player}</span> bid they can flip over ${this.currentBidNumber} cards`,
+          gamePhase: 'bid',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -140,7 +141,7 @@ export default class Room {
       }
     });
     /**
-     * passBid TODO: FIX UP NOT WORKING
+     * passBid: When a player passes a bid. Need to go to the next non-passed player or if everyone has passed, move to challenge phase
      */
     newPlayer.socket.on('passBid', () => {
       this.passedBid[this.activePlayerIndex] = 1;
@@ -148,10 +149,11 @@ export default class Room {
       const allPlayersPassed = this.increaseActivePlayerIndex();
       const current = this.getActiveDetails();
       if (allPlayersPassed) {
+        this.setupChallenge();
         this.io.in(this.roomId).emit('updateGameState', {
-          currentMessage: `<span style="color:${current.color}";>${current.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards 🤔`,
-          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> passed their bid 😬`,
-          gamePhase: 'flippingCards',
+          currentMessage: `<span class="${current.color}--text">${current.player}</span> won the bid! They need to flip over ${this.currentBidNumber} cards`,
+          addedLogMessage: `<span class="${previous.color}--text">${previous.player}</span> passed their bid`,
+          gamePhase: 'challenge',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -160,9 +162,9 @@ export default class Room {
         });
       } else {
         this.io.in(this.roomId).emit('updateGameState', {
-          currentMessage: `<span style="color:${current.color}";>${current.player}</span>'s turn to increase the bid or pass`,
-          addedLogMessage: `<span style="color:${previous.color}";>${previous.player}</span> passed their bid 😬`,
-          gamePhase: 'bidding',
+          currentMessage: `<span class="${current.color}--text">${current.player}</span>'s turn to increase the bid or pass`,
+          addedLogMessage: `<span class="${previous.color}--text">${previous.player}</span> passed their bid`,
+          gamePhase: 'bid',
           round: this.round,
           biddingMinimum: this.currentBidNumber + 1,
           playerStates: this.getPlayerStates(),
@@ -183,19 +185,26 @@ export default class Room {
 
   // return true if everyone passed and we want to go to challenge mode
   increaseActivePlayerIndex(): boolean {
-    let numberOfPassedPlayers = 0;
+    // Find the next player who has not passed
     do {
       if (this.activePlayerIndex === this.players.length - 1) {
         this.activePlayerIndex = 0;
       } else {
         this.activePlayerIndex++;
       }
-      if (++numberOfPassedPlayers === this.players.length - 1) {
-        // we went through everyone and they all passed...
-        return true;
-      }
     } while (this.passedBid[this.activePlayerIndex] === 1);
+    const totalPassedPlayers = this.passedBid.reduce(
+      (accumulator, curr) => accumulator + curr,
+    );
+    // we went through everyone and they all passed...
+    if (totalPassedPlayers === this.players.length - 1) return true;
     return false;
+  }
+
+  setupChallenge(): void {
+    for (let i = 0; i < this.players.length; i++) {
+      this.players[i].setupNextToFlipIndex();
+    }
   }
 
   emitUpdatedPlayerList(): void {
@@ -273,17 +282,15 @@ export default class Room {
       Math.random() * this.players.length,
     );
     this.activePlayerIndex = this.startingPlayerIndex;
-    const activePlayer =
-      this.players[this.activePlayerIndex].username;
-    const activeColor = this.players[this.activePlayerIndex].color;
+    const current = this.getActiveDetails();
     this.io.in(this.roomId).emit('updateGameState', {
-      currentMessage: `<span style="color:${activeColor}";>${activePlayer}</span>'s turn`,
+      currentMessage: `<span class="${current.color}--text">${current.player}</span>'s turn`,
       addedLogMessage: `Round 1! 🎉`,
       gamePhase: 'placingCards',
       round: this.round,
       biddingMinimum: 1, // Not really using this yet
       playerStates: this.getPlayerStates(),
-      activePlayer: activePlayer,
+      activePlayer: current.player,
       cardsPlayed: this.cardsPlayed,
     });
   }
@@ -297,6 +304,7 @@ export default class Room {
         points: player.points,
         numberOfSkulls: player.numberOfSkulls,
         numberOfRoses: player.numberOfRoses,
+        nextToFlipIndex: player.nextToFlipIndex,
       };
     });
   }

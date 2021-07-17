@@ -20,8 +20,8 @@
       <v-simple-table>
         <template v-slot:default>
           <tbody>
-            <tr v-for="item in playerStates" :key="item.player">
-              <td class="pr-1">{{ item.player }}</td>
+            <tr v-for="item in playerStates" :key="item.username">
+              <td class="pr-1">{{ item.username }}</td>
               <td class="px-1">
                 <v-icon> mdi-trophy </v-icon>
                 {{ item.points }}
@@ -99,7 +99,7 @@
         </v-row>
       </v-container>
       <v-container>
-        <v-row v-if="initiateBiddingMode || gamePhase === 'bidding'">
+        <v-row v-if="initiateBiddingMode || gamePhase === 'bid'">
           <v-col class="pt-13">
             <v-slider
               v-model="bidNumber"
@@ -114,7 +114,6 @@
               <template v-slot:prepend>
                 <v-icon @click="bidNumber--"> mdi-minus </v-icon>
               </template>
-
               <template v-slot:append>
                 <v-icon @click="bidNumber++"> mdi-plus </v-icon>
               </template>
@@ -131,7 +130,7 @@
             </v-btn>
           </v-col>
         </v-row>
-        <v-row v-if="gamePhase === 'bidding'">
+        <v-row v-if="gamePhase === 'bid'">
           <v-col>
             <v-btn
               block
@@ -148,6 +147,26 @@
               @click="passBid"
             >
               Pass
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-container
+        v-if="gamePhase === 'challenge' && activePlayer === username"
+      >
+        <v-row>
+          <v-col
+            v-for="player in playerStates"
+            :key="player.username"
+            :cols="Math.floor(12 / playerStates.length)"
+          >
+            <v-btn
+              :value="player.username"
+              :color="player.color"
+              block
+              :disabled="player.username !== username"
+            >
+              {{ player.username }} ({{ player.nextToFlipIndex + 1 }})
             </v-btn>
           </v-col>
         </v-row>
@@ -191,11 +210,23 @@ export default {
       this.messageLog.unshift(newAddedLogMessage);
     },
     playerStates(newPlayerStates) {
-      const userPlayerState = newPlayerStates.find(
-        (playerState) => playerState.username === this.username,
-      );
-      this.numberOfSkulls = userPlayerState.numberOfSkulls;
-      this.numberOfRoses = userPlayerState.numberOfRoses;
+      if (this.gamePhase === 'placingCards') {
+        const userPlayerState = newPlayerStates.find(
+          (playerState) => playerState.username === this.username,
+        );
+        this.numberOfSkulls = userPlayerState.numberOfSkulls;
+        this.numberOfRoses = userPlayerState.numberOfRoses;
+      }
+      // THIS SHOULD BE DONE AT THE SERVER SIDE
+      if (this.gamePhase === 'challenge') {
+        const activePlayerState = this.playerStates.find(
+          (state) => state.username === this.activePlayer,
+        );
+        if (activePlayerState) {
+          this.noMoreToFlip =
+            activePlayerState.nextToFlipIndex === -1;
+        }
+      }
     },
   },
   methods: {

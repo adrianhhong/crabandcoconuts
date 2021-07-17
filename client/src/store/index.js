@@ -16,6 +16,16 @@ export default new Vuex.Store({
     playerStates: [],
     activePlayer: '',
     cardsPlayed: 0,
+    // playerStates: [
+    //   {
+    //     username: 'heyo',
+    //     slots: [1, 1, 0, 0],
+    //     color: 'red',
+    //     points: 3,
+    //     numberOfSkulls: 1,
+    //     numberOfRoses: 3,
+    //   },
+    // ],
   },
   mutations: {
     mutatePlayerDetails(state, payload) {

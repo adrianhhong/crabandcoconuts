@@ -5,11 +5,10 @@ export default class Player {
   socket: PlayerType['socket'];
   /**
    * 0: empty: Slot with no card on it
-   * 1: faceup-skull
+   * 1: facedown
    * 2: faceup-rose
-   * 3: facedown
-   * 4: clickable: Player can click to add a new card facedown
-   * 5: disabled: Player has less than 4 cards, and so a certain number of slots will be disabled
+   * 3: faceup-skull
+   * 4: disabled: Player has less than 4 cards, and so a certain number of slots will be disabled
    */
   slots: PlayerType['slots'] = [0, 0, 0, 0];
 
@@ -23,6 +22,7 @@ export default class Player {
   points: PlayerType['points'] = 0; // number of rounds won
   numberOfSkulls: PlayerType['numberOfSkulls'] = 1; // number of skulls left
   numberOfRoses: PlayerType['numberOfRoses'] = 3; // number of skulls left
+  nextToFlipIndex: PlayerType['nextToFlipIndex'] = 0;
 
   constructor(
     username: PlayerType['username'],
@@ -32,5 +32,9 @@ export default class Player {
     this.username = username;
     this.socket = socket;
     this.color = color;
+  }
+
+  setupNextToFlipIndex(): void {
+    this.nextToFlipIndex = this.slots.lastIndexOf(1);
   }
 }

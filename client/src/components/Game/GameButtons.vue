@@ -41,17 +41,15 @@ export default {
         case 0:
           return { icon: '', isOutlined: true };
         case 1:
-          return { icon: 'mdi-skull', isOutlined: false };
+          return { icon: '', isOutlined: false };
         case 2:
           return { icon: 'mdi-flower-poppy', isOutlined: false };
         case 3:
-          return { icon: 'mdi-help', isOutlined: false };
+          return { icon: 'mdi-skull', isOutlined: false };
         case 4:
-          return { icon: 'mdi-plus', isOutlined: true };
-        case 5:
           return { icon: 'mdi-window-close', isOutlined: true };
         default:
-          return { icon: 'mdi-exclamation', isOutlined: true };
+          return { icon: 'mdi-help', isOutlined: true };
       }
     },
   },

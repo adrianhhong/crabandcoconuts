@@ -24,6 +24,7 @@ export interface PlayerType {
   points: number;
   numberOfSkulls: number;
   numberOfRoses: number;
+  nextToFlipIndex: number;
 }
 
 export interface PlayerButtonState {
