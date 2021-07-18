@@ -164,7 +164,12 @@
               :value="player.username"
               :color="player.color"
               block
-              :disabled="player.username !== username"
+              :disabled="
+                (player.username !== username &&
+                  !flippedOverAllMyOwn) ||
+                (player.username === username && flippedOverAllMyOwn)
+              "
+              @click="flipOver(player)"
             >
               {{ player.username }} ({{ player.nextToFlipIndex + 1 }})
             </v-btn>
@@ -190,6 +195,7 @@ export default {
       initiateBiddingMode: false,
       numberOfSkulls: 0,
       numberOfRoses: 0,
+      flippedOverAllMyOwn: false,
     };
   },
   computed: {
@@ -223,7 +229,7 @@ export default {
           (state) => state.username === this.activePlayer,
         );
         if (activePlayerState) {
-          this.noMoreToFlip =
+          this.flippedOverAllMyOwn =
             activePlayerState.nextToFlipIndex === -1;
         }
       }
@@ -243,6 +249,11 @@ export default {
     },
     passBid: function () {
       this.$socket.client.emit('passBid');
+    },
+    flipOver: function (playerState) {
+      this.$socket.client.emit('flipOver', {
+        username: playerState.username,
+      });
     },
   },
 };

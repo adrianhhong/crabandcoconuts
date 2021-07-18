@@ -21,6 +21,7 @@ export default class Room {
   currentBidNumber = 0;
   currentBidder = '';
   passedBid: RoomType['passedBid'] = [];
+  cardsFlipped = 0;
 
   constructor(
     io: RoomType['io'],
@@ -171,6 +172,34 @@ export default class Room {
           activePlayer: current.player,
           cardsPlayed: this.cardsPlayed,
         });
+      }
+    });
+    /**
+     * flipOver: When a player is challenging and flips over a card
+     */
+    newPlayer.socket.on('flipOver', ({ username }) => {
+      const thisPlayer = this.findPlayer(username);
+
+      if (thisPlayer !== null) {
+        const successfulFlip = thisPlayer.flipOverCard();
+        if (successfulFlip) {
+          this.cardsFlipped++;
+          const current = this.getActiveDetails();
+          this.io.in(this.roomId).emit('updateGameState', {
+            currentMessage: `<span class="${current.color}--text">${
+              current.player
+            }</span> needs to flip over ${
+              this.currentBidNumber - this.cardsFlipped
+            } more`,
+            addedLogMessage: `<span class="${current.color}--text">${current.player}</span> flipped over a Rose on their ${this.cardsFlipped} go`,
+            gamePhase: 'challenge',
+            round: this.round,
+            biddingMinimum: this.currentBidNumber + 1,
+            playerStates: this.getPlayerStates(),
+            activePlayer: current.player,
+            cardsPlayed: this.cardsPlayed,
+          });
+        }
       }
     });
   }

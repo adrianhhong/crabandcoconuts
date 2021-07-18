@@ -37,4 +37,25 @@ export default class Player {
   setupNextToFlipIndex(): void {
     this.nextToFlipIndex = this.slots.lastIndexOf(1);
   }
+
+  /**
+   *
+   * @returns true if successful flip, false if failed flip
+   */
+  flipOverCard(): boolean {
+    const flippedHiddenCard = this.hiddenSlots[this.nextToFlipIndex];
+    if (flippedHiddenCard === 1) {
+      // you lost the challenge, and we need to remove a card from you
+      this.slots[this.nextToFlipIndex] = 3;
+      // emit the updated game state to everyone that you lost.
+      return false;
+    }
+    if (flippedHiddenCard === 2) {
+      this.slots[this.nextToFlipIndex] = 2;
+      this.nextToFlipIndex--;
+      // Emit the updated game state to everyone...
+      return true;
+    }
+    return false;
+  }
 }
