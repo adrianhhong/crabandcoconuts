@@ -20,9 +20,11 @@ export default class Player {
   hiddenSlots: PlayerType['slots'] = [0, 0, 0, 0];
   color: PlayerType['color'];
   points: PlayerType['points'] = 0; // number of rounds won
-  numberOfSkulls: PlayerType['numberOfSkulls'] = 1; // number of skulls left
-  numberOfRoses: PlayerType['numberOfRoses'] = 3; // number of skulls left
+  numberOfSkulls: PlayerType['numberOfSkulls'] = 1; // number of skulls left to place
+  numberOfRoses: PlayerType['numberOfRoses'] = 3; // number of roses left to place
   nextToFlipIndex: PlayerType['nextToFlipIndex'] = 0;
+  totalSkulls: PlayerType['numberOfSkulls'] = 1; // number of skulls in hand
+  totalRoses: PlayerType['numberOfRoses'] = 3; // number of roses in hand
 
   constructor(
     username: PlayerType['username'],
@@ -47,13 +49,11 @@ export default class Player {
     if (flippedHiddenCard === 1) {
       // you lost the challenge, and we need to remove a card from you
       this.slots[this.nextToFlipIndex] = 3;
-      // emit the updated game state to everyone that you lost.
       return false;
     }
     if (flippedHiddenCard === 2) {
       this.slots[this.nextToFlipIndex] = 2;
       this.nextToFlipIndex--;
-      // Emit the updated game state to everyone...
       return true;
     }
     return false;

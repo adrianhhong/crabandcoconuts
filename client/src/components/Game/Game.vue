@@ -90,7 +90,10 @@
           <v-col>
             <v-btn
               block
-              :disabled="round === 0 || username !== activePlayer"
+              :disabled="
+                placingCardsVariables.round === 0 ||
+                username !== activePlayer
+              "
               @click="initiateBiddingMode = true"
             >
               Challenge
@@ -106,8 +109,8 @@
               track-color="grey"
               ticks="always"
               tick-size="7"
-              :min="biddingMinimum"
-              :max="cardsPlayed"
+              :min="bidVariables.biddingMinimum"
+              :max="bidVariables.cardsPlayed"
               thumb-label="always"
               :disabled="username !== activePlayer"
             >
@@ -167,6 +170,8 @@
               :disabled="
                 (player.username !== username &&
                   !flippedOverAllMyOwn) ||
+                (player.username !== username &&
+                  player.nextToFlipIndex === -1) ||
                 (player.username === username && flippedOverAllMyOwn)
               "
               @click="flipOver(player)"
@@ -174,6 +179,52 @@
               {{ player.username }} ({{ player.nextToFlipIndex + 1 }})
             </v-btn>
           </v-col>
+        </v-row>
+      </v-container>
+      <v-container
+        v-if="
+          gamePhase === 'removeCardsRandom' &&
+          activePlayer === username
+        "
+      >
+        <v-row>
+          <v-col>
+            <v-btn
+              :color="activePlayer.color"
+              block
+              @click="removeRandom()"
+            >
+              Random Remove
+            </v-btn></v-col
+          >
+        </v-row>
+      </v-container>
+      <v-container
+        v-if="
+          gamePhase === 'removeCardsPick' && activePlayer === username
+        "
+      >
+        <v-row>
+          <v-col>
+            <v-btn
+              :color="activePlayer.color"
+              block
+              :disable="removeCardsVariables.totalRoses === 0"
+              @click="removePick('rose')"
+            >
+              Remove Rose ({{ removeCardsVariables.totalRoses }})
+            </v-btn></v-col
+          >
+          <v-col>
+            <v-btn
+              :color="activePlayer.color"
+              block
+              :disable="removeCardsVariables.totalSkulls === 0"
+              @click="removePick('skull')"
+            >
+              Remove Skull ({{ removeCardsVariables.totalSkulls }})
+            </v-btn></v-col
+          >
         </v-row>
       </v-container>
     </v-container>
@@ -203,12 +254,12 @@ export default {
       'username',
       'currentMessage',
       'addedLogMessage',
-      'gamePhase',
-      'round',
-      'biddingMinimum',
-      'playerStates',
       'activePlayer',
-      'cardsPlayed',
+      'gamePhase',
+      'playerStates',
+      'placingCardsVariables',
+      'bidVariables',
+      'removeCardsVariables',
     ]),
   },
   watch: {
@@ -223,7 +274,7 @@ export default {
         this.numberOfSkulls = userPlayerState.numberOfSkulls;
         this.numberOfRoses = userPlayerState.numberOfRoses;
       }
-      // THIS SHOULD BE DONE AT THE SERVER SIDE
+      // THIS SHOULD BE DONE AT THE SERVER SIDE??
       if (this.gamePhase === 'challenge') {
         const activePlayerState = this.playerStates.find(
           (state) => state.username === this.activePlayer,
@@ -253,6 +304,14 @@ export default {
     flipOver: function (playerState) {
       this.$socket.client.emit('flipOver', {
         username: playerState.username,
+      });
+    },
+    removeRandom: function () {
+      this.$socket.client.emit('removeRandom', {});
+    },
+    removePick: function (typeOfCard) {
+      this.$socket.client.emit('removePick', {
+        typeOfCard: typeOfCard,
       });
     },
   },

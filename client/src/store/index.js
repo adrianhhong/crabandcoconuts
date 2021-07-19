@@ -10,22 +10,12 @@ export default new Vuex.Store({
     hostUsername: '',
     currentMessage: '',
     addedLogMessage: '',
-    gamePhase: '',
-    round: 0,
-    biddingMinimum: 1,
     playerStates: [],
     activePlayer: '',
-    cardsPlayed: 0,
-    // playerStates: [
-    //   {
-    //     username: 'heyo',
-    //     slots: [1, 1, 0, 0],
-    //     color: 'red',
-    //     points: 3,
-    //     numberOfSkulls: 1,
-    //     numberOfRoses: 3,
-    //   },
-    // ],
+    gamePhase: '',
+    placingCardsVariables: { round: 0 },
+    bidVariables: { biddingMinimum: 1, cardsPlayed: 0 },
+    removeCardsVariables: { totalSkulls: 1, totalRoses: 3 },
   },
   mutations: {
     mutatePlayerDetails(state, payload) {
@@ -35,12 +25,12 @@ export default new Vuex.Store({
     SOCKET_UPDATEGAMESTATE(state, payload) {
       state.currentMessage = payload.currentMessage;
       state.addedLogMessage = payload.addedLogMessage;
-      state.gamePhase = payload.gamePhase;
-      state.round = payload.round;
-      state.biddingMinimum = payload.biddingMinimum;
       state.playerStates = payload.playerStates;
       state.activePlayer = payload.activePlayer;
-      state.cardsPlayed = payload.cardsPlayed;
+      state.gamePhase = payload.gamePhase;
+      state.placingCardsVariables = payload.placingCardsVariables;
+      state.bidVariables = payload.bidVariables;
+      state.removeCardsVariables = payload.removeCardsVariables;
     },
   },
   actions: {},

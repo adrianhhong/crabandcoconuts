@@ -53,6 +53,16 @@ io.on('connection', async (socket: Socket) => {
           }
         }
       }
+      // ! Remove for PROD
+      if (enterRoomAction === 'createDev') {
+        const createdRoom = skull.newRoomDev();
+        createdRoom.addPlayer(username, socket);
+        socket.emit('enterRoomSuccess', {
+          username: username,
+          roomId: createdRoom.roomId,
+        });
+        logger.info(`Room created: ${createdRoom.roomId}`);
+      }
     },
   );
 

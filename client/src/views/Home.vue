@@ -14,7 +14,18 @@
         <v-row justify="center" align="center">
           <v-col>
             <v-layout justify-center>
-              <v-btn rounded @click="onCreateGame">Create Game</v-btn>
+              <v-row>
+                <v-col>
+                  <v-btn rounded @click="onCreateGame"
+                    >Create Game</v-btn
+                  >
+                </v-col>
+                <v-col>
+                  <v-btn rounded @click="onCreateDev" class="mt-3"
+                    >Create aaaa</v-btn
+                  >
+                </v-col>
+              </v-row>
             </v-layout>
           </v-col>
           <v-col> <v-layout justify-center>OR</v-layout></v-col>
@@ -34,6 +45,13 @@
                 </v-form>
                 <v-btn rounded @click="onJoinGame" class="mt-3"
                   >Join Game</v-btn
+                ></v-col
+              ></v-row
+            >
+            <v-row>
+              <v-col>
+                <v-btn rounded @click="onJoinDev" class="mt-3"
+                  >Join aaaa</v-btn
                 ></v-col
               ></v-row
             ></v-col
@@ -94,6 +112,27 @@ export default {
         this.$socket.client.emit('homeNewEnterRoom', {
           username: this.username.trim(),
           roomId: this.roomId,
+          enterRoomAction: 'join',
+        });
+      }
+    },
+    // !! Remove for PROD
+    onCreateDev: function () {
+      if (this.$refs.name.validate()) {
+        this.$socket.client.emit('homeNewEnterRoom', {
+          username: this.username.trim(),
+          roomId: '',
+          enterRoomAction: 'createDev',
+        });
+      }
+    },
+    // !! Remove for PROD
+    onJoinDev: function () {
+      const nameIsValidated = this.$refs.name.validate();
+      if (nameIsValidated) {
+        this.$socket.client.emit('homeNewEnterRoom', {
+          username: this.username.trim(),
+          roomId: 'aaaa',
           enterRoomAction: 'join',
         });
       }
