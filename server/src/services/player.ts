@@ -25,6 +25,7 @@ export default class Player {
   nextToFlipIndex: PlayerType['nextToFlipIndex'] = 0;
   totalSkulls: PlayerType['numberOfSkulls'] = 1; // number of skulls in hand
   totalRoses: PlayerType['numberOfRoses'] = 3; // number of roses in hand
+  isEliminated = false;
 
   constructor(
     username: PlayerType['username'],

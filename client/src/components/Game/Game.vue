@@ -55,178 +55,189 @@
         </template>
       </v-simple-table>
       <!-- Buttons -->
-      <v-container
-        class="my-4"
-        v-if="
-          initiateBiddingMode === false &&
-          gamePhase === 'placingCards'
-        "
-      >
-        <v-row>
-          <v-col col="6">
-            <v-btn
-              block
-              :disabled="
-                username !== activePlayer || numberOfRoses === 0
-              "
-              @click="playCard('rose')"
+      <div v-if="!isEliminated">
+        <v-container
+          class="my-4"
+          v-if="
+            initiateBiddingMode === false &&
+            gamePhase === 'placingCards'
+          "
+        >
+          <v-row>
+            <v-col col="6">
+              <v-btn
+                block
+                :disabled="
+                  username !== activePlayer || numberOfRoses === 0
+                "
+                @click="playCard('rose')"
+              >
+                Play Rose ({{ numberOfRoses }})
+              </v-btn>
+            </v-col>
+            <v-col col="6">
+              <v-btn
+                block
+                :disabled="
+                  username !== activePlayer || numberOfSkulls === 0
+                "
+                @click="playCard('skull')"
+              >
+                Play Skull ({{ numberOfSkulls }})
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-btn
+                block
+                :disabled="
+                  placingCardsVariables.round === 0 ||
+                  username !== activePlayer
+                "
+                @click="initiateBiddingMode = true"
+              >
+                Challenge
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container>
+          <v-row v-if="initiateBiddingMode || gamePhase === 'bid'">
+            <v-col class="pt-13">
+              <v-slider
+                v-model="bidNumber"
+                track-color="grey"
+                ticks="always"
+                tick-size="7"
+                :min="bidVariables.biddingMinimum"
+                :max="bidVariables.cardsPlayed"
+                thumb-label="always"
+                :disabled="username !== activePlayer"
+              >
+                <template v-slot:prepend>
+                  <v-icon @click="bidNumber--"> mdi-minus </v-icon>
+                </template>
+                <template v-slot:append>
+                  <v-icon @click="bidNumber++"> mdi-plus </v-icon>
+                </template>
+              </v-slider>
+            </v-col>
+          </v-row>
+          <v-row v-if="initiateBiddingMode">
+            <v-col>
+              <v-btn block @click="confirmBid"> Confirm </v-btn>
+            </v-col>
+            <v-col>
+              <v-btn block @click="initiateBiddingMode = false">
+                Back
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row v-if="gamePhase === 'bid'">
+            <v-col>
+              <v-btn
+                block
+                :disabled="username !== activePlayer"
+                @click="confirmBid"
+              >
+                Raise
+              </v-btn>
+            </v-col>
+            <v-col>
+              <v-btn
+                block
+                :disabled="username !== activePlayer"
+                @click="passBid"
+              >
+                Pass
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container
+          v-if="
+            gamePhase === 'challenge' && activePlayer === username
+          "
+        >
+          <v-row>
+            <v-col
+              v-for="player in playerStates"
+              :key="player.username"
+              :cols="Math.floor(12 / playerStates.length)"
             >
-              Play Rose ({{ numberOfRoses }})
-            </v-btn>
-          </v-col>
-          <v-col col="6">
-            <v-btn
-              block
-              :disabled="
-                username !== activePlayer || numberOfSkulls === 0
-              "
-              @click="playCard('skull')"
+              <v-btn
+                :value="player.username"
+                :color="player.color"
+                block
+                :disabled="
+                  (player.username !== username &&
+                    !flippedOverAllMyOwn) ||
+                  (player.username !== username &&
+                    player.nextToFlipIndex === -1) ||
+                  (player.username === username &&
+                    flippedOverAllMyOwn)
+                "
+                @click="flipOver(player)"
+              >
+                {{ player.username }} ({{
+                  player.nextToFlipIndex + 1
+                }})
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container
+          v-if="
+            gamePhase === 'removeCardsPick' &&
+            activePlayer === username
+          "
+        >
+          <v-row>
+            <v-col>
+              <v-btn
+                :color="activePlayer.color"
+                block
+                :disable="removeCardsVariables.totalRoses === 0"
+                @click="removePick('rose')"
+              >
+                Remove Rose ({{ removeCardsVariables.totalRoses }})
+              </v-btn></v-col
             >
-              Play Skull ({{ numberOfSkulls }})
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-btn
-              block
-              :disabled="
-                placingCardsVariables.round === 0 ||
-                username !== activePlayer
-              "
-              @click="initiateBiddingMode = true"
+            <v-col>
+              <v-btn
+                :color="activePlayer.color"
+                block
+                :disable="removeCardsVariables.totalSkulls === 0"
+                @click="removePick('skull')"
+              >
+                Remove Skull ({{ removeCardsVariables.totalSkulls }})
+              </v-btn></v-col
             >
-              Challenge
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-container>
-        <v-row v-if="initiateBiddingMode || gamePhase === 'bid'">
-          <v-col class="pt-13">
-            <v-slider
-              v-model="bidNumber"
-              track-color="grey"
-              ticks="always"
-              tick-size="7"
-              :min="bidVariables.biddingMinimum"
-              :max="bidVariables.cardsPlayed"
-              thumb-label="always"
-              :disabled="username !== activePlayer"
+          </v-row>
+        </v-container>
+        <v-container
+          v-if="
+            gamePhase === 'eliminated' && activePlayer === username
+          "
+        >
+          <v-row>
+            <v-col
+              v-for="player in playerStatesWithoutEliminated"
+              :key="player.username"
+              :cols="Math.floor(12 / playerStates.length)"
             >
-              <template v-slot:prepend>
-                <v-icon @click="bidNumber--"> mdi-minus </v-icon>
-              </template>
-              <template v-slot:append>
-                <v-icon @click="bidNumber++"> mdi-plus </v-icon>
-              </template>
-            </v-slider>
-          </v-col>
-        </v-row>
-        <v-row v-if="initiateBiddingMode">
-          <v-col>
-            <v-btn block @click="confirmBid"> Confirm </v-btn>
-          </v-col>
-          <v-col>
-            <v-btn block @click="initiateBiddingMode = false">
-              Back
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row v-if="gamePhase === 'bid'">
-          <v-col>
-            <v-btn
-              block
-              :disabled="username !== activePlayer"
-              @click="confirmBid"
-            >
-              Raise
-            </v-btn>
-          </v-col>
-          <v-col>
-            <v-btn
-              block
-              :disabled="username !== activePlayer"
-              @click="passBid"
-            >
-              Pass
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-container
-        v-if="gamePhase === 'challenge' && activePlayer === username"
-      >
-        <v-row>
-          <v-col
-            v-for="player in playerStates"
-            :key="player.username"
-            :cols="Math.floor(12 / playerStates.length)"
-          >
-            <v-btn
-              :value="player.username"
-              :color="player.color"
-              block
-              :disabled="
-                (player.username !== username &&
-                  !flippedOverAllMyOwn) ||
-                (player.username !== username &&
-                  player.nextToFlipIndex === -1) ||
-                (player.username === username && flippedOverAllMyOwn)
-              "
-              @click="flipOver(player)"
-            >
-              {{ player.username }} ({{ player.nextToFlipIndex + 1 }})
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-      <v-container
-        v-if="
-          gamePhase === 'removeCardsRandom' &&
-          activePlayer === username
-        "
-      >
-        <v-row>
-          <v-col>
-            <v-btn
-              :color="activePlayer.color"
-              block
-              @click="removeRandom()"
-            >
-              Random Remove
-            </v-btn></v-col
-          >
-        </v-row>
-      </v-container>
-      <v-container
-        v-if="
-          gamePhase === 'removeCardsPick' && activePlayer === username
-        "
-      >
-        <v-row>
-          <v-col>
-            <v-btn
-              :color="activePlayer.color"
-              block
-              :disable="removeCardsVariables.totalRoses === 0"
-              @click="removePick('rose')"
-            >
-              Remove Rose ({{ removeCardsVariables.totalRoses }})
-            </v-btn></v-col
-          >
-          <v-col>
-            <v-btn
-              :color="activePlayer.color"
-              block
-              :disable="removeCardsVariables.totalSkulls === 0"
-              @click="removePick('skull')"
-            >
-              Remove Skull ({{ removeCardsVariables.totalSkulls }})
-            </v-btn></v-col
-          >
-        </v-row>
-      </v-container>
+              <v-btn
+                :value="player.username"
+                :color="player.color"
+                @click="startNextRound(player)"
+              >
+                {{ player.username }}
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+      </div>
     </v-container>
   </div>
 </template>
@@ -247,6 +258,8 @@ export default {
       numberOfSkulls: 0,
       numberOfRoses: 0,
       flippedOverAllMyOwn: false,
+      playerStatesWithoutEliminated: [],
+      isEliminated: false,
     };
   },
   computed: {
@@ -284,6 +297,17 @@ export default {
             activePlayerState.nextToFlipIndex === -1;
         }
       }
+      if (this.gamePhase === 'eliminated') {
+        this.playerStatesWithoutEliminated = this.playerStates.filter(
+          (state) => state.isEliminated === false,
+        );
+      }
+      this.isEliminated = this.playerStates.forEach((state) => {
+        if (state.username === this.username) {
+          if (state.isEliminated === true) return true;
+          else return false;
+        } // TODO: fix up what if username does not exist....??????
+      });
     },
   },
   methods: {
@@ -306,12 +330,14 @@ export default {
         username: playerState.username,
       });
     },
-    removeRandom: function () {
-      this.$socket.client.emit('removeRandom', {});
-    },
     removePick: function (typeOfCard) {
       this.$socket.client.emit('removePick', {
         typeOfCard: typeOfCard,
+      });
+    },
+    startNextRound: function (player) {
+      this.$socket.client.emit('startNextRound', {
+        username: player.username,
       });
     },
   },
