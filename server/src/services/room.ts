@@ -72,6 +72,7 @@ export default class Room {
       this.removePlayer(newPlayer.username);
       this.emitUpdatedPlayerList();
     });
+
     // playCard: When a player plays a card (skull or rose) update their hiddenSlots and slots
     newPlayer.socket.on('playCard', ({ card }) => {
       // Set hiddenSlots and numberOfRoses/Skulls
@@ -119,6 +120,7 @@ export default class Room {
         },
       });
     });
+
     // raiseBid: When a player submits an initial bid
     newPlayer.socket.on('raiseBid', ({ bidNumber }) => {
       this.currentBidNumber = bidNumber;
@@ -163,6 +165,7 @@ export default class Room {
         });
       }
     });
+
     // passBid: When a player passes a bid. Need to go to the next non-passed player or if everyone has passed, move to challenge phase
     newPlayer.socket.on('passBid', () => {
       this.passedBid[this.activePlayerIndex] = 1;
@@ -206,128 +209,23 @@ export default class Room {
         });
       }
     });
+
     // flipOver: When a player is challenging and flips over a card
     newPlayer.socket.on('flipOver', ({ username }) => {
       const flippedPlayer = this.findPlayer(username);
       if (flippedPlayer !== null) {
         const successfulFlip = flippedPlayer.flipOverCard();
         if (successfulFlip) {
-          this.cardsFlipped++;
-          // Succesful flip, hasn't flipped over all yet
-          if (this.cardsFlipped !== this.cardsPlayed) {
-            const current = this.getActiveDetails();
-            this.io.in(this.roomId).emit('updateGameState', {
-              currentMessage: `<span class="${current.color}--text">${
-                current.player
-              }</span> needs to flip over ${
-                this.currentBidNumber - this.cardsFlipped
-              } more`,
-              addedLogMessage: `<span class="${current.color}--text">${current.player}</span> flipped over <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span> 's rose on turn ${this.cardsFlipped}`,
-              playerStates: this.getPlayerStates(),
-              activePlayer: current.player,
-              gamePhase: 'challenge',
-              placingCardsVariables: { round: this.round },
-              bidVariables: {
-                biddingMinimum: 1, // Not using
-                cardsPlayed: this.cardsPlayed,
-              },
-              removeCardsVariables: {
-                totalSkulls: 1, // Not using
-                totalRoses: 3, // Not using
-              },
-            });
-          }
-          // Successfully flipped last card they needed to, gain a point
-          if (this.cardsFlipped === this.currentBidNumber) {
-            const tempCardsFlipped = this.cardsFlipped;
-            this.resetRound();
-            newPlayer.points++;
-            const current = this.getActiveDetails();
-            this.io.in(this.roomId).emit('updateGameState', {
-              currentMessage: `<span class="${current.color}--text">${current.player}</span> starts the next round`,
-              addedLogMessage: `<span class="${current.color}--text">${current.player}</span> was successful at flipping over ${tempCardsFlipped} cards and has gained a point!`,
-              playerStates: this.getPlayerStates(),
-              activePlayer: current.player,
-              gamePhase: 'placingCards',
-              placingCardsVariables: { round: this.round },
-              bidVariables: {
-                biddingMinimum: 1, // Not using
-                cardsPlayed: this.cardsPlayed,
-              },
-              removeCardsVariables: {
-                totalSkulls: 1, // Not using
-                totalRoses: 3, // Not using
-              },
-            });
-          }
+          this.onSuccessfulFlip(newPlayer, flippedPlayer);
         }
-        // Unsucessful flip, flipped own skull
         if (!successfulFlip) {
-          const current = this.getActiveDetails();
-          if (flippedPlayer.username === newPlayer.username) {
-            this.io.in(this.roomId).emit('updateGameState', {
-              currentMessage: `<span class="${current.color}--text">${current.player}</span> needs to choose a card to remove`,
-              addedLogMessage: `<span class="${current.color}--text">${current.player}</span> hit <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s skull`,
-              playerStates: this.getPlayerStates(),
-              activePlayer: current.player,
-              gamePhase: 'removeCardsPick',
-              placingCardsVariables: { round: this.round },
-              bidVariables: {
-                biddingMinimum: 1, // Not using
-                cardsPlayed: this.cardsPlayed,
-              },
-              removeCardsVariables: {
-                totalSkulls: 1, // Not using
-                totalRoses: 3, // Not using
-              },
-            });
-          }
-          // Unsuccessful flip, flipped someone elses skull
-          if (flippedPlayer.username !== newPlayer.username) {
-            const skullPicked =
-              Math.random() <
-              newPlayer.numberOfSkulls /
-                (newPlayer.numberOfRoses + newPlayer.numberOfSkulls);
-            if (skullPicked) {
-              newPlayer.totalSkulls--;
-            }
-            if (!skullPicked) {
-              newPlayer.totalRoses--;
-            }
-            const totalCardsLeft =
-              newPlayer.numberOfRoses + newPlayer.numberOfSkulls;
-            newPlayer.slots[totalCardsLeft] = 4;
-            const current = this.getActiveDetails();
-            let eliminatedMessage = '';
-            if (totalCardsLeft === 0) {
-              newPlayer.isEliminated = true;
-              eliminatedMessage = `<br/><span class="${current.color}--text">${current.player}</span> has no more cards and is eliminated`;
-            } // TODO: CHeck if only one player left so the one player left wins the game
-            this.activePlayerIndex = this.players.findIndex(
-              (player) => player.username === flippedPlayer.username,
-            );
-            this.io.in(this.roomId).emit('updateGameState', {
-              currentMessage: `<span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span> starts the next round`,
-              addedLogMessage: `<span class="${current.color}--text">${current.player}</span> hit <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s skull, and randomly loses a card.${eliminatedMessage}`,
-              playerStates: this.getPlayerStates(),
-              activePlayer: flippedPlayer.username,
-              gamePhase: 'placingCards',
-              placingCardsVariables: { round: this.round },
-              bidVariables: {
-                biddingMinimum: 1, // Not using
-                cardsPlayed: this.cardsPlayed,
-              },
-              removeCardsVariables: {
-                totalSkulls: newPlayer.totalSkulls,
-                totalRoses: newPlayer.totalRoses,
-              },
-            });
-          }
+          this.onUnsuccessfulFlip(newPlayer, flippedPlayer);
         }
       }
     });
+
     // removePick: activePlayer picks a card to remove when flipping their own skull
-    newPlayer.socket.on('removePick', (typeOfCard: string) => {
+    newPlayer.socket.on('removePick', ({ typeOfCard }) => {
       if (typeOfCard === 'skull') {
         newPlayer.totalSkulls--;
       }
@@ -335,51 +233,35 @@ export default class Room {
         newPlayer.totalRoses--;
       }
       const totalCardsLeft =
-        newPlayer.numberOfRoses + newPlayer.numberOfSkulls;
+        newPlayer.totalRoses + newPlayer.totalSkulls;
       newPlayer.slots[totalCardsLeft] = 4;
+      this.resetRound();
       const current = this.getActiveDetails();
-      if (totalCardsLeft === 0) {
-        this.io.in(this.roomId).emit('updateGameState', {
-          currentMessage: `<span class="${current.color}--text">${current.player}</span> is choosing a player to start the next round`,
-          addedLogMessage: `<span class="${current.color}--text">${current.player}</span> has no cards and has been eliminated`,
-          playerStates: this.getPlayerStates(),
-          activePlayer: current.player,
-          gamePhase: 'eliminated',
-          placingCardsVariables: { round: this.round },
-          bidVariables: {
-            biddingMinimum: 1, // Not using
-            cardsPlayed: this.cardsPlayed,
-          },
-          removeCardsVariables: {
-            totalSkulls: newPlayer.totalSkulls,
-            totalRoses: newPlayer.totalRoses,
-          },
-        });
-      } else {
-        this.io.in(this.roomId).emit('updateGameState', {
-          currentMessage: `<span class="${current.color}--text">${current.player}</span> starts the next round`,
-          addedLogMessage: `<span class="${current.color}--text">${current.player}</span> has chosen a card to remove`,
-          playerStates: this.getPlayerStates(),
-          activePlayer: current.player,
-          gamePhase: 'placingCards',
-          placingCardsVariables: { round: this.round },
-          bidVariables: {
-            biddingMinimum: 1, // Not using
-            cardsPlayed: this.cardsPlayed,
-          },
-          removeCardsVariables: {
-            totalSkulls: newPlayer.totalSkulls,
-            totalRoses: newPlayer.totalRoses,
-          },
-        });
-      }
+      this.io.in(this.roomId).emit('updateGameState', {
+        currentMessage: `<span class="${current.color}--text">${current.player}</span> starts the next round`,
+        addedLogMessage: `<span class="${current.color}--text">${current.player}</span> has chosen a card to remove`,
+        playerStates: this.getPlayerStates(),
+        activePlayer: current.player,
+        gamePhase: 'placingCards',
+        placingCardsVariables: { round: this.round },
+        bidVariables: {
+          biddingMinimum: 1, // Not using
+          cardsPlayed: this.cardsPlayed,
+        },
+        removeCardsVariables: {
+          totalSkulls: newPlayer.totalSkulls,
+          totalRoses: newPlayer.totalRoses,
+        },
+      });
     });
+
     // startNextRound: eliminated player chooses who to start next round
     newPlayer.socket.on('startNextRound', (username: string) => {
       newPlayer.isEliminated = true;
       this.activePlayerIndex = this.players.findIndex(
         (player) => player.username === username,
       );
+      this.resetRound();
       const nextPlayer = this.findPlayer(username);
       const current = this.getActiveDetails();
       this.io.in(this.roomId).emit('updateGameState', {
@@ -399,6 +281,149 @@ export default class Room {
         },
       });
     });
+  }
+
+  onSuccessfulFlip(newPlayer: Player, flippedPlayer: Player): void {
+    this.cardsFlipped++;
+    // Successful flip, hasn't flipped over all yet
+    if (this.cardsFlipped !== this.cardsPlayed) {
+      const current = this.getActiveDetails();
+      this.io.in(this.roomId).emit('updateGameState', {
+        currentMessage: `<span class="${current.color}--text">${
+          current.player
+        }</span> needs to flip over ${
+          this.currentBidNumber - this.cardsFlipped
+        } more`,
+        addedLogMessage: `<span class="${current.color}--text">${current.player}</span> flipped over <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span> 's rose on turn ${this.cardsFlipped}`,
+        playerStates: this.getPlayerStates(),
+        activePlayer: current.player,
+        gamePhase: 'challenge',
+        placingCardsVariables: { round: this.round },
+        bidVariables: {
+          biddingMinimum: 1, // Not using
+          cardsPlayed: this.cardsPlayed,
+        },
+        removeCardsVariables: {
+          totalSkulls: 1, // Not using
+          totalRoses: 3, // Not using
+        },
+      });
+    }
+    // Successfully flipped last card they needed to, gain a point
+    if (this.cardsFlipped === this.currentBidNumber) {
+      const tempCardsFlipped = this.cardsFlipped;
+      this.resetRound();
+      newPlayer.points++;
+      const current = this.getActiveDetails();
+      this.io.in(this.roomId).emit('updateGameState', {
+        currentMessage: `<span class="${current.color}--text">${current.player}</span> starts the next round`,
+        addedLogMessage: `<span class="${current.color}--text">${current.player}</span> was successful at flipping over ${tempCardsFlipped} cards and has gained a point!`,
+        playerStates: this.getPlayerStates(),
+        activePlayer: current.player,
+        gamePhase: 'placingCards',
+        placingCardsVariables: { round: this.round },
+        bidVariables: {
+          biddingMinimum: 1, // Not using
+          cardsPlayed: this.cardsPlayed,
+        },
+        removeCardsVariables: {
+          totalSkulls: 1, // Not using
+          totalRoses: 3, // Not using
+        },
+      });
+    }
+  }
+
+  onUnsuccessfulFlip(newPlayer: Player, flippedPlayer: Player): void {
+    const current = this.getActiveDetails();
+    // Flipped own skull
+    if (flippedPlayer.username === newPlayer.username) {
+      // Only has 1 card left, eliminated from game, chose own skull so gets to choose who to start next round
+      // TODO: CHeck if only one player left so the one player left wins the game
+      if (newPlayer.totalRoses + newPlayer.totalSkulls === 1) {
+        this.io.in(this.roomId).emit('updateGameState', {
+          currentMessage: `<span class="${current.color}--text">${current.player}</span> is choosing a player to start the next round`,
+          addedLogMessage: `<span class="${current.color}--text">${current.player}</span> has no cards and has been eliminated`,
+          playerStates: this.getPlayerStates(),
+          activePlayer: current.player,
+          gamePhase: 'eliminated',
+          placingCardsVariables: { round: this.round },
+          bidVariables: {
+            biddingMinimum: 1, // Not using
+            cardsPlayed: this.cardsPlayed,
+          },
+          removeCardsVariables: {
+            totalSkulls: 1, // Not using
+            totalRoses: 3, // Not using
+          },
+        });
+      } else {
+        // Has more than 1 card left, needs to choose a card to remove
+        this.io.in(this.roomId).emit('updateGameState', {
+          currentMessage: `<span class="${current.color}--text">${current.player}</span> needs to choose a card to remove`,
+          addedLogMessage: `<span class="${current.color}--text">${current.player}</span> hit <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s skull`,
+          playerStates: this.getPlayerStates(),
+          activePlayer: current.player,
+          gamePhase: 'removeCardsPick',
+          placingCardsVariables: { round: this.round },
+          bidVariables: {
+            biddingMinimum: 1, // Not using
+            cardsPlayed: this.cardsPlayed,
+          },
+          removeCardsVariables: {
+            totalSkulls: newPlayer.totalSkulls,
+            totalRoses: newPlayer.totalRoses,
+          },
+        });
+      }
+    }
+    // Flipped someone elses skull, randomly loses a card
+    if (flippedPlayer.username !== newPlayer.username) {
+      const skullPicked =
+        Math.random() <
+        newPlayer.numberOfSkulls /
+          (newPlayer.numberOfRoses + newPlayer.numberOfSkulls);
+      console.log(
+        '🚀 ~ file: room.ts ~ line 383 ~ Room ~ onUnsuccessfulFlip ~ skullPicked',
+        skullPicked,
+      );
+      if (skullPicked) {
+        newPlayer.totalSkulls--;
+      } else {
+        newPlayer.totalRoses--;
+      }
+      const totalCardsLeft =
+        newPlayer.totalRoses + newPlayer.totalSkulls;
+      newPlayer.slots[totalCardsLeft] = 4;
+      const current = this.getActiveDetails();
+      let eliminatedMessage = '';
+      // Eliminated from the game
+      if (totalCardsLeft === 0) {
+        newPlayer.isEliminated = true;
+        eliminatedMessage = `<span class="${current.color}--text">${current.player}</span> has no more cards and is eliminated</br>`;
+        this.activePlayerIndex = this.players.findIndex(
+          (player) => player.username === flippedPlayer.username,
+        );
+      } // TODO: CHeck if only one player left so the one player left wins the game
+      this.resetRound();
+      // Start next round
+      this.io.in(this.roomId).emit('updateGameState', {
+        currentMessage: `<span class="${current.color}--text">${current.player}</span> starts the next round`,
+        addedLogMessage: `${eliminatedMessage}<span class="${current.color}--text">${current.player}</span> hit <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s skull, and randomly loses a card.`,
+        playerStates: this.getPlayerStates(),
+        activePlayer: this.players[this.activePlayerIndex].username,
+        gamePhase: 'placingCards',
+        placingCardsVariables: { round: this.round },
+        bidVariables: {
+          biddingMinimum: 1, // Not using
+          cardsPlayed: this.cardsPlayed,
+        },
+        removeCardsVariables: {
+          totalSkulls: newPlayer.totalSkulls,
+          totalRoses: newPlayer.totalRoses,
+        },
+      });
+    }
   }
 
   getActiveDetails(): ActiveDetails {
@@ -436,8 +461,8 @@ export default class Room {
           this.activePlayerIndex++;
         }
       } while (
-        this.passedBid[this.activePlayerIndex] === 1 &&
-        this.players[this.activePlayerIndex].isEliminated === false
+        this.passedBid[this.activePlayerIndex] === 1 ||
+        this.players[this.activePlayerIndex].isEliminated === true
       );
       const totalPassedPlayers = this.passedBid.reduce(
         (accumulator, curr) => accumulator + curr,
@@ -559,7 +584,7 @@ export default class Room {
         numberOfSkulls: player.numberOfSkulls,
         numberOfRoses: player.numberOfRoses,
         nextToFlipIndex: player.nextToFlipIndex,
-        isEliminated: player.eliminated,
+        isEliminated: player.isEliminated,
       };
     });
   }

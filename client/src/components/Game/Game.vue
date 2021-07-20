@@ -68,7 +68,7 @@
               <v-btn
                 block
                 :disabled="
-                  username !== activePlayer || numberOfRoses === 0
+                  username !== activePlayer || numberOfRoses <= 0
                 "
                 @click="playCard('rose')"
               >
@@ -79,7 +79,7 @@
               <v-btn
                 block
                 :disabled="
-                  username !== activePlayer || numberOfSkulls === 0
+                  username !== activePlayer || numberOfSkulls <= 0
                 "
                 @click="playCard('skull')"
               >
@@ -238,6 +238,7 @@
           </v-row>
         </v-container>
       </div>
+      <div v-if="isEliminated"><h1>you have been eliminated</h1></div>
     </v-container>
   </div>
 </template>
@@ -302,15 +303,15 @@ export default {
           (state) => state.isEliminated === false,
         );
       }
-      this.isEliminated = this.playerStates.forEach((state) => {
-        if (state.username === this.username) {
-          if (state.isEliminated === true) return true;
-          else return false;
-        } // TODO: fix up what if username does not exist....??????
-      });
+      const indexOfPlayer = this.playerStates.findIndex(
+        (state) => state.username === this.username,
+      );
+      this.isEliminated =
+        this.playerStates[indexOfPlayer].isEliminated;
     },
   },
   methods: {
+    // TODO: implement debouncing so that the user cant press more than once.... maybe load when clicked https://laracasts.com/discuss/channels/vue/how-to-add-delay-on-at-click-to-prevent-multiple-click https://forum.vuejs.org/t/how-to-prevent-that-button-being-clicked-twice/56114/2
     playCard: function (cardType) {
       this.$socket.client.emit('playCard', {
         card: cardType,
