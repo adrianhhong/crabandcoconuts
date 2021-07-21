@@ -81,6 +81,7 @@ export default {
   name: 'Home',
   data: () => {
     return {
+      stopButtonRequests: false,
       username: '',
       roomId: '',
       rules: {
@@ -96,46 +97,69 @@ export default {
     };
   },
   methods: {
+    /**
+     * Prevents button being clicked multiple times sending multiple requests to the server
+     */
+    debounceClick: function (callback) {
+      if (this.stopButtonRequests) return;
+      callback();
+      this.stopButtonRequests = true;
+      setTimeout(() => {
+        this.stopButtonRequests = false;
+      }, 10000);
+    },
+
     onCreateGame: function () {
-      if (this.$refs.name.validate()) {
-        this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.username.trim(),
-          roomId: '',
-          enterRoomAction: 'create',
-        });
-      }
+      this.debounceClick(() => {
+        if (this.$refs.name.validate()) {
+          this.$socket.client.emit('homeNewEnterRoom', {
+            username: this.username.trim(),
+            roomId: '',
+            enterRoomAction: 'create',
+          });
+        }
+      });
     },
+
     onJoinGame: function () {
-      const nameIsValidated = this.$refs.name.validate();
-      const roomIdIsValidated = this.$refs.roomId.validate();
-      if (nameIsValidated && roomIdIsValidated) {
-        this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.username.trim(),
-          roomId: this.roomId,
-          enterRoomAction: 'join',
-        });
-      }
+      this.debounceClick(() => {
+        const nameIsValidated = this.$refs.name.validate();
+        const roomIdIsValidated = this.$refs.roomId.validate();
+        if (nameIsValidated && roomIdIsValidated) {
+          this.$socket.client.emit('homeNewEnterRoom', {
+            username: this.username.trim(),
+            roomId: this.roomId,
+            enterRoomAction: 'join',
+          });
+        }
+      });
     },
+
     // !! Remove for PROD
     onCreateDev: function () {
-      if (this.$refs.name.validate()) {
-        this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.username.trim(),
-          roomId: '',
-          enterRoomAction: 'createDev',
-        });
-      }
+      this.debounceClick(() => {
+        if (this.$refs.name.validate()) {
+          this.$socket.client.emit('homeNewEnterRoom', {
+            username: this.username.trim(),
+            roomId: '',
+            enterRoomAction: 'createDev',
+          });
+        }
+      });
     },
+
     // !! Remove for PROD
     onJoinDev: function () {
-      const nameIsValidated = this.$refs.name.validate();
-      if (nameIsValidated) {
-        this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.username.trim(),
-          roomId: 'aaaa',
-          enterRoomAction: 'join',
-        });
-      }
+      this.debounceClick(() => {
+        const nameIsValidated = this.$refs.name.validate();
+        if (nameIsValidated) {
+          this.$socket.client.emit('homeNewEnterRoom', {
+            username: this.username.trim(),
+            roomId: 'aaaa',
+            enterRoomAction: 'join',
+          });
+        }
+      });
     },
   },
   sockets: {
@@ -143,6 +167,7 @@ export default {
      * On successfully created room, commit username and roomId to store, and route to room
      */
     enterRoomSuccess: function ({ username, roomId }) {
+      this.stopButtonRequests = false;
       this.$store.commit('mutatePlayerDetails', {
         username: username,
         roomId: roomId,
@@ -153,6 +178,7 @@ export default {
      * On a failure to join room, show error message
      */
     joinRoomFail: function ({ message }) {
+      this.stopButtonRequests = false;
       this.errorMessage = message;
       this.snackbarShow = true;
     },

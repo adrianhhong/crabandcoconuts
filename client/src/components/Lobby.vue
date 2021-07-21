@@ -115,6 +115,7 @@ export default {
   name: 'Room',
   data: () => {
     return {
+      stopButtonRequests: false,
       usernames: [],
       showLoaderText: false,
       hostUsername: '',
@@ -129,6 +130,18 @@ export default {
     });
   },
   methods: {
+    /**
+     * Prevents button being clicked multiple times sending multiple requests to the server
+     */
+    debounceClick: function (callback) {
+      if (this.stopButtonRequests) return;
+      callback();
+      this.stopButtonRequests = true;
+      setTimeout(() => {
+        this.stopButtonRequests = false;
+      }, 10000);
+    },
+
     onLeaveRoom: function () {
       this.$socket.client.emit('roomLeave', {
         username: this.username.trim(),
@@ -136,9 +149,12 @@ export default {
       });
       this.$router.push('/');
     },
+
     onStartGame: function () {
-      this.$socket.client.emit('roomStart', {
-        roomId: this.roomId,
+      this.debounceClick(() => {
+        this.$socket.client.emit('roomStart', {
+          roomId: this.roomId,
+        });
       });
     },
   },
@@ -153,6 +169,7 @@ export default {
       }
     },
     startGame: function () {
+      this.stopButtonRequests = false;
       this.$emit('update:currentView', 'Game');
     },
   },

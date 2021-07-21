@@ -253,6 +253,7 @@ export default {
   },
   data: () => {
     return {
+      stopButtonRequests: false,
       bidNumber: 1,
       messageLog: [],
       initiateBiddingMode: false,
@@ -281,6 +282,7 @@ export default {
       this.messageLog.unshift(newAddedLogMessage);
     },
     playerStates(newPlayerStates) {
+      this.stopButtonRequests = false;
       if (this.gamePhase === 'placingCards') {
         const userPlayerState = newPlayerStates.find(
           (playerState) => playerState.username === this.username,
@@ -311,34 +313,62 @@ export default {
     },
   },
   methods: {
-    // TODO: implement debouncing so that the user cant press more than once.... maybe load when clicked https://laracasts.com/discuss/channels/vue/how-to-add-delay-on-at-click-to-prevent-multiple-click https://forum.vuejs.org/t/how-to-prevent-that-button-being-clicked-twice/56114/2
+    /**
+     * Prevents button being clicked multiple times sending multiple requests to the server
+     */
+    debounceClick: function (callback) {
+      if (this.stopButtonRequests) return;
+      callback();
+      this.stopButtonRequests = true;
+      setTimeout(() => {
+        this.stopButtonRequests = false;
+      }, 10000);
+    },
+
     playCard: function (cardType) {
-      this.$socket.client.emit('playCard', {
-        card: cardType,
+      this.debounceClick(() => {
+        this.$socket.client.emit('playCard', {
+          card: cardType,
+        });
       });
     },
+
     confirmBid: function () {
-      this.$socket.client.emit('raiseBid', {
-        bidNumber: this.bidNumber,
+      this.debounceClick(() => {
+        this.$socket.client.emit('raiseBid', {
+          bidNumber: this.bidNumber,
+        });
+        this.initiateBiddingMode = false;
       });
-      this.initiateBiddingMode = false;
     },
+
     passBid: function () {
-      this.$socket.client.emit('passBid');
+      this.debounceClick(() => {
+        this.$socket.client.emit('passBid');
+      });
     },
+
     flipOver: function (playerState) {
-      this.$socket.client.emit('flipOver', {
-        username: playerState.username,
+      this.debounceClick(() => {
+        this.$socket.client.emit('flipOver', {
+          username: playerState.username,
+        });
       });
     },
+
     removePick: function (typeOfCard) {
-      this.$socket.client.emit('removePick', {
-        typeOfCard: typeOfCard,
+      this.debounceClick(() => {
+        this.$socket.client.emit('removePick', {
+          typeOfCard: typeOfCard,
+        });
       });
     },
+
     startNextRound: function (player) {
-      this.$socket.client.emit('startNextRound', {
-        username: player.username,
+      this.debounceClick(() => {
+        this.$socket.client.emit('startNextRound', {
+          username: player.username,
+        });
       });
     },
   },

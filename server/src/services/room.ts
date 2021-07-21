@@ -22,6 +22,7 @@ export default class Room {
   currentBidder = '';
   passedBid: RoomType['passedBid'] = []; // Array that is 1 if the player passed, 0 if the player has not passed their bid
   cardsFlipped = 0;
+  eliminatedPlayers = 0;
 
   constructor(
     io: RoomType['io'],
@@ -95,7 +96,11 @@ export default class Room {
       // Increase cardsPlayed
       this.cardsPlayed++;
       // Check if round has increased
-      if (this.cardsPlayed % this.players.length === 0) {
+      if (
+        this.cardsPlayed %
+          (this.players.length - this.eliminatedPlayers) ===
+        0
+      ) {
         this.round++;
       }
       this.increaseActivePlayerIndex();
@@ -341,6 +346,7 @@ export default class Room {
       // Only has 1 card left, eliminated from game, chose own skull so gets to choose who to start next round
       // TODO: CHeck if only one player left so the one player left wins the game
       if (newPlayer.totalRoses + newPlayer.totalSkulls === 1) {
+        this.eliminatedPlayers++;
         this.io.in(this.roomId).emit('updateGameState', {
           currentMessage: `<span class="${current.color}--text">${current.player}</span> is choosing a player to start the next round`,
           addedLogMessage: `<span class="${current.color}--text">${current.player}</span> has no cards and has been eliminated`,
@@ -383,10 +389,6 @@ export default class Room {
         Math.random() <
         newPlayer.numberOfSkulls /
           (newPlayer.numberOfRoses + newPlayer.numberOfSkulls);
-      console.log(
-        '🚀 ~ file: room.ts ~ line 383 ~ Room ~ onUnsuccessfulFlip ~ skullPicked',
-        skullPicked,
-      );
       if (skullPicked) {
         newPlayer.totalSkulls--;
       } else {
@@ -399,6 +401,7 @@ export default class Room {
       let eliminatedMessage = '';
       // Eliminated from the game
       if (totalCardsLeft === 0) {
+        this.eliminatedPlayers++;
         newPlayer.isEliminated = true;
         eliminatedMessage = `<span class="${current.color}--text">${current.player}</span> has no more cards and is eliminated</br>`;
         this.activePlayerIndex = this.players.findIndex(
@@ -408,7 +411,7 @@ export default class Room {
       this.resetRound();
       // Start next round
       this.io.in(this.roomId).emit('updateGameState', {
-        currentMessage: `<span class="${current.color}--text">${current.player}</span> starts the next round`,
+        currentMessage: `<span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span> starts the next round`,
         addedLogMessage: `${eliminatedMessage}<span class="${current.color}--text">${current.player}</span> hit <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s skull, and randomly loses a card.`,
         playerStates: this.getPlayerStates(),
         activePlayer: this.players[this.activePlayerIndex].username,
