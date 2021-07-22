@@ -302,7 +302,9 @@ export default {
       }
       if (this.gamePhase === 'eliminated') {
         this.playerStatesWithoutEliminated = this.playerStates.filter(
-          (state) => state.isEliminated === false,
+          (state) =>
+            state.isEliminated === false &&
+            state.username !== this.username,
         );
       }
       const indexOfPlayer = this.playerStates.findIndex(
