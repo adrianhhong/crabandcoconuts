@@ -11,7 +11,6 @@ export default class Player {
    * 4: disabled: Player has less than 4 cards, and so a certain number of slots will be disabled
    */
   slots: PlayerType['slots'] = [0, 0, 0, 0];
-
   /**
    * 0: nothing
    * 1: skull
@@ -58,5 +57,17 @@ export default class Player {
       return true;
     }
     return false;
+  }
+
+  resetAllStates(): void {
+    this.slots = [0, 0, 0, 0];
+    this.hiddenSlots = [0, 0, 0, 0];
+    this.points = 0;
+    this.numberOfSkulls = 1;
+    this.numberOfRoses = 3;
+    this.nextToFlipIndex = 0;
+    this.totalSkulls = 1;
+    this.totalRoses = 3;
+    this.isEliminated = false;
   }
 }

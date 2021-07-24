@@ -238,7 +238,21 @@
           </v-row>
         </v-container>
       </div>
-      <div v-if="isEliminated"><h1>you have been eliminated</h1></div>
+      <div v-if="isEliminated && gamePhase !== 'playerWins'">
+        <h1>you have been eliminated</h1>
+      </div>
+      <v-container v-if="gamePhase === 'playerWins'">
+        <v-row>
+          <v-col>
+            <h1>{{ activePlayer }} wins the game!</h1>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-btn @click="restartGame()"> Play again </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-container>
   </div>
 </template>
@@ -371,6 +385,12 @@ export default {
         this.$socket.client.emit('startNextRound', {
           username: player.username,
         });
+      });
+    },
+
+    restartGame: function () {
+      this.debounceClick(() => {
+        this.$socket.client.emit('restartGame');
       });
     },
   },

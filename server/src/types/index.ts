@@ -38,6 +38,6 @@ export interface PlayerButtonState {
 
 export interface ActiveDetails {
   color: string;
-  player: string;
+  username: string;
   round: number;
 }
