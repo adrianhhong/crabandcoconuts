@@ -103,41 +103,28 @@
           </v-row>
         </v-container>
         <v-container>
-          <v-row v-if="initiateBiddingMode || gamePhase === 'bid'">
-            <v-col class="pt-13">
-              <v-slider
-                v-model="bidNumber"
-                track-color="grey"
-                ticks="always"
-                tick-size="7"
-                :min="bidVariables.biddingMinimum"
-                :max="bidVariables.cardsPlayed"
-                thumb-label="always"
-                :disabled="username !== activePlayer"
-              >
-                <template v-slot:prepend>
-                  <v-icon @click="bidNumber--"> mdi-minus </v-icon>
-                </template>
-                <template v-slot:append>
-                  <v-icon @click="bidNumber++"> mdi-plus </v-icon>
-                </template>
-              </v-slider>
-              <!-- <v-text-field
-                v-model="bidNumber"
-                type="number"
-                :min="bidVariables.biddingMinimum"
-                :max="bidVariables.cardsPlayed"
-                :disabled="username !== activePlayer"
-                hide-details
-                single-line
-              >
-                <template v-slot:prepend>
-                  <v-icon @click="bidNumber--"> mdi-minus </v-icon>
-                </template>
-                <template v-slot:append-outer>
-                  <v-icon @click="bidNumber++"> mdi-plus </v-icon>
-                </template>
-              </v-text-field> -->
+          <v-row
+            v-if="
+              initiateBiddingMode ||
+              (gamePhase === 'bid' && username === activePlayer)
+            "
+          >
+            <v-col cols="5">
+              <v-btn icon :disabled="username !== activePlayer">
+                <v-icon @click="changeBidNumber(-1)">
+                  mdi-minus
+                </v-icon>
+              </v-btn>
+            </v-col>
+            <v-col cols="2">
+              <h2>{{ bidNumber }}</h2>
+            </v-col>
+            <v-col cols="5">
+              <v-btn icon :disabled="username !== activePlayer">
+                <v-icon @click="changeBidNumber(1)">
+                  mdi-plus
+                </v-icon>
+              </v-btn>
             </v-col>
           </v-row>
           <v-row v-if="initiateBiddingMode">
@@ -311,6 +298,9 @@ export default {
     addedLogMessage(newAddedLogMessage) {
       this.messageLog.unshift(newAddedLogMessage);
     },
+    bidVariables(newBidVariables) {
+      this.bidNumber = newBidVariables.biddingMinimum;
+    },
     playerStates(newPlayerStates) {
       this.stopButtonRequests = false;
       if (this.gamePhase === 'placingCards') {
@@ -320,7 +310,6 @@ export default {
         this.numberOfSkulls = userPlayerState.numberOfSkulls;
         this.numberOfRoses = userPlayerState.numberOfRoses;
       }
-      // THIS SHOULD BE DONE AT THE SERVER SIDE??
       if (this.gamePhase === 'challenge') {
         const activePlayerState = this.playerStates.find(
           (state) => state.username === this.activePlayer,
@@ -345,6 +334,21 @@ export default {
     },
   },
   methods: {
+    changeBidNumber: function (amount) {
+      if (
+        amount === 1 &&
+        this.bidNumber < this.bidVariables.cardsPlayed
+      ) {
+        this.bidNumber++;
+      }
+      if (
+        amount === -1 &&
+        this.bidNumber > this.bidVariables.biddingMinimum
+      ) {
+        this.bidNumber--;
+      }
+    },
+
     /**
      * Prevents button being clicked multiple times sending multiple requests to the server
      */

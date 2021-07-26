@@ -2,3 +2,14 @@
 $body-font-family: 'Yantramanav', sans-serif !important;
 
 $btn-text-transform: none !important;
+$material-light: (
+  'background': #fffde7,
+);
+
+$btn-font-sizes: (
+  'x-small': 0.625rem,
+  'small': 0.75rem,
+  'default': 1.2rem,
+  'large': 2rem,
+  'x-large': 1rem,
+);

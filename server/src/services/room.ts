@@ -641,7 +641,7 @@ export default class Room {
     const current = this.getActiveDetails();
     this.io.in(this.roomId).emit('updateGameState', {
       currentMessage: `<span class="${current.color}--text">${current.username}</span>'s turn to start`,
-      addedLogMessage: `Game has been restarted`,
+      addedLogMessage: `Game start!`,
       playerStates: this.getPlayerStates(),
       activePlayer: current.username,
       gamePhase: 'placingCards',

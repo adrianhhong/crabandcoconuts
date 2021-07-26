@@ -1,39 +1,50 @@
 <template>
   <div>
     <v-container style="max-width: 600px">
-      <h1 class="text-center">skull</h1>
+      <v-row>
+        <v-col>
+          <h1 class="text-center">crab & shells</h1>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-divider class="mb-10" />
+        </v-col>
+      </v-row>
       <v-form ref="name">
         <v-text-field
+          outlined
+          rounded
           v-model="username"
           label="Enter your name"
           maxlength="15"
           :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
         ></v-text-field>
       </v-form>
-      <v-container fluid style="height: 500px">
-        <v-row justify="center" align="center">
-          <v-col>
-            <v-layout justify-center>
-              <v-row>
-                <v-col>
-                  <v-btn rounded @click="onCreateGame"
-                    >Create Game</v-btn
-                  >
-                </v-col>
-                <v-col>
-                  <v-btn rounded @click="onCreateDev" class="mt-3"
-                    >Create aaaa</v-btn
-                  >
-                </v-col>
-              </v-row>
-            </v-layout>
+      <v-container fluid style="height: 300px">
+        <v-row align="center">
+          <v-col class="text-center">
+            <v-row>
+              <v-col>
+                <v-btn rounded @click="onCreateGame">Create</v-btn>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-btn rounded @click="onCreateDev" class="mt-3"
+                  >aaaa</v-btn
+                >
+              </v-col>
+            </v-row>
           </v-col>
-          <v-col> <v-layout justify-center>OR</v-layout></v-col>
-          <v-col>
-            <v-row justify="center" align="center">
+          <v-col class="text-center">or</v-col>
+          <v-col class="text-center">
+            <v-row>
               <v-col>
                 <v-form ref="roomId">
                   <v-text-field
+                    outlined
+                    rounded
                     v-model="roomId"
                     label="Room ID"
                     maxlength="4"
@@ -44,20 +55,55 @@
                   ></v-text-field>
                 </v-form>
                 <v-btn rounded @click="onJoinGame" class="mt-3"
-                  >Join Game</v-btn
-                ></v-col
-              ></v-row
-            >
+                  >Join</v-btn
+                >
+              </v-col>
+            </v-row>
             <v-row>
               <v-col>
                 <v-btn rounded @click="onJoinDev" class="mt-3"
-                  >Join aaaa</v-btn
+                  >aaaa</v-btn
                 ></v-col
               ></v-row
             ></v-col
           >
         </v-row></v-container
       >
+      <v-row>
+        <v-col>
+          <v-divider />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="text-center">
+          <small
+            >Based on the original
+            <a
+              href="https://boardgamegeek.com/boardgame/92415/skull"
+              target="_blank"
+              >Skull & Roses</a
+            ></small
+          >
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
+        <v-col class="text-center" cols="12">
+          <v-btn
+            icon
+            href="https://github.com/adrianhhong/skull"
+            target="_blank"
+          >
+            <v-icon>mdi-github</v-icon>
+          </v-btn>
+          <strong
+            ><a
+              href="https://github.com/adrianhhong/skull"
+              target="_blank"
+              >Adrian Hong</a
+            ></strong
+          >
+        </v-col>
+      </v-row>
     </v-container>
     <v-snackbar v-model="snackbarShow">
       {{ errorMessage }}
@@ -96,6 +142,9 @@ export default {
       snackbarShow: false,
     };
   },
+  created: function () {
+    this.stopButtonRequests = false;
+  },
   methods: {
     /**
      * Prevents button being clicked multiple times sending multiple requests to the server
@@ -108,57 +157,63 @@ export default {
         this.stopButtonRequests = false;
       }, 10000);
     },
-
     onCreateGame: function () {
+      const isValidated = this.$refs.name.validate();
+      if (!isValidated) {
+        this.stopButtonRequests = false;
+        return;
+      }
       this.debounceClick(() => {
-        if (this.$refs.name.validate()) {
-          this.$socket.client.emit('homeNewEnterRoom', {
-            username: this.username.trim(),
-            roomId: '',
-            enterRoomAction: 'create',
-          });
-        }
+        this.$socket.client.emit('homeNewEnterRoom', {
+          username: this.username.trim(),
+          roomId: '',
+          enterRoomAction: 'create',
+        });
       });
     },
-
     onJoinGame: function () {
+      const nameIsValidated = this.$refs.name.validate();
+      const roomIdIsValidated = this.$refs.roomId.validate();
+      if (!nameIsValidated || !roomIdIsValidated) {
+        this.stopButtonRequests = false;
+        return;
+      }
       this.debounceClick(() => {
-        const nameIsValidated = this.$refs.name.validate();
-        const roomIdIsValidated = this.$refs.roomId.validate();
-        if (nameIsValidated && roomIdIsValidated) {
-          this.$socket.client.emit('homeNewEnterRoom', {
-            username: this.username.trim(),
-            roomId: this.roomId,
-            enterRoomAction: 'join',
-          });
-        }
+        this.$socket.client.emit('homeNewEnterRoom', {
+          username: this.username.trim(),
+          roomId: this.roomId,
+          enterRoomAction: 'join',
+        });
       });
     },
-
     // !! Remove for PROD
     onCreateDev: function () {
+      const isValidated = this.$refs.name.validate();
+      if (!isValidated) {
+        this.stopButtonRequests = false;
+        return;
+      }
       this.debounceClick(() => {
-        if (this.$refs.name.validate()) {
-          this.$socket.client.emit('homeNewEnterRoom', {
-            username: this.username.trim(),
-            roomId: '',
-            enterRoomAction: 'createDev',
-          });
-        }
+        this.$socket.client.emit('homeNewEnterRoom', {
+          username: this.username.trim(),
+          roomId: '',
+          enterRoomAction: 'createDev',
+        });
       });
     },
-
     // !! Remove for PROD
     onJoinDev: function () {
+      const nameIsValidated = this.$refs.name.validate();
+      if (!nameIsValidated) {
+        this.stopButtonRequests = false;
+        return;
+      }
       this.debounceClick(() => {
-        const nameIsValidated = this.$refs.name.validate();
-        if (nameIsValidated) {
-          this.$socket.client.emit('homeNewEnterRoom', {
-            username: this.username.trim(),
-            roomId: 'aaaa',
-            enterRoomAction: 'join',
-          });
-        }
+        this.$socket.client.emit('homeNewEnterRoom', {
+          username: this.username.trim(),
+          roomId: 'aaaa',
+          enterRoomAction: 'join',
+        });
       });
     },
   },
