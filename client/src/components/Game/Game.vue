@@ -122,6 +122,22 @@
                   <v-icon @click="bidNumber++"> mdi-plus </v-icon>
                 </template>
               </v-slider>
+              <!-- <v-text-field
+                v-model="bidNumber"
+                type="number"
+                :min="bidVariables.biddingMinimum"
+                :max="bidVariables.cardsPlayed"
+                :disabled="username !== activePlayer"
+                hide-details
+                single-line
+              >
+                <template v-slot:prepend>
+                  <v-icon @click="bidNumber--"> mdi-minus </v-icon>
+                </template>
+                <template v-slot:append-outer>
+                  <v-icon @click="bidNumber++"> mdi-plus </v-icon>
+                </template>
+              </v-text-field> -->
             </v-col>
           </v-row>
           <v-row v-if="initiateBiddingMode">
