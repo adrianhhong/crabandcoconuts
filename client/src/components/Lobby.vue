@@ -20,7 +20,7 @@
           >
             {{ roomId }}
             <template v-slot:loader>
-              <span>Copied!</span>
+              <v-icon>mdi-check</v-icon>
             </template>
           </v-btn>
         </v-col>
@@ -60,6 +60,7 @@
         <v-col class="text-right">
           <v-btn
             v-if="username === hostUsername && usernames.length >= 3"
+            color="buttons"
             rounded
             @click="onStartGame"
             >Start</v-btn
@@ -71,6 +72,7 @@
                   v-if="
                     username === hostUsername && usernames.length < 3
                   "
+                  color="buttons"
                   rounded
                   disabled
                   >Start</v-btn
@@ -84,6 +86,7 @@
               <span v-bind="attrs" v-on="on">
                 <v-btn
                   v-if="username !== hostUsername"
+                  color="buttons"
                   rounded
                   disabled
                   >Start</v-btn
@@ -100,7 +103,9 @@
           </v-tooltip>
         </v-col>
         <v-col class="text-left">
-          <v-btn rounded @click="onLeaveRoom">Leave</v-btn>
+          <v-btn color="buttons" rounded @click="onLeaveRoom"
+            >Leave</v-btn
+          >
         </v-col>
       </v-row>
     </v-container>

@@ -26,12 +26,18 @@
           <v-col class="text-center">
             <v-row>
               <v-col>
-                <v-btn rounded @click="onCreateGame">Create</v-btn>
+                <v-btn color="buttons" rounded @click="onCreateGame"
+                  >Create</v-btn
+                >
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <v-btn rounded @click="onCreateDev" class="mt-3"
+                <v-btn
+                  color="buttons"
+                  rounded
+                  @click="onCreateDev"
+                  class="mt-3"
                   >aaaa</v-btn
                 >
               </v-col>
@@ -54,14 +60,22 @@
                     ]"
                   ></v-text-field>
                 </v-form>
-                <v-btn rounded @click="onJoinGame" class="mt-3"
+                <v-btn
+                  color="buttons"
+                  rounded
+                  @click="onJoinGame"
+                  class="mt-3"
                   >Join</v-btn
                 >
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <v-btn rounded @click="onJoinDev" class="mt-3"
+                <v-btn
+                  color="buttons"
+                  rounded
+                  @click="onJoinDev"
+                  class="mt-3"
                   >aaaa</v-btn
                 ></v-col
               ></v-row

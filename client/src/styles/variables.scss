@@ -1,7 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Yantramanav&display=swap');
-$body-font-family: 'Yantramanav', sans-serif !important;
+// @import url('https://fonts.googleapis.com/css2?family=Yantramanav&display=swap');
+// $body-font-family: 'Yantramanav', sans-serif !important;
+// @import url('https://fonts.googleapis.com/css2?family=Averia+Sans+Libre&display=swap');
+// $body-font-family: 'Averia Sans Libre', cursive !important;
+// @import url('https://fonts.googleapis.com/css2?family=Averia+Gruesa+Libre&display=swap');
+// $body-font-family: 'Averia Gruesa Libre', cursive !important;
+@import url('https://fonts.googleapis.com/css2?family=Allerta&display=swap');
+$body-font-family: 'Allerta', sans-serif !important;
 
 $btn-text-transform: none !important;
+
 $material-light: (
   'background': #fffde7,
 );
@@ -13,3 +20,5 @@ $btn-font-sizes: (
   'large': 2rem,
   'x-large': 1rem,
 );
+
+// $btn-outline-border-width: 4px;

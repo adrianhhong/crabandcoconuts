@@ -2,7 +2,7 @@
   <div>
     <v-container class="text-center" style="max-width: 600px">
       <!-- Messages -->
-      <v-card height="180" class="my-4">
+      <v-card height="180" class="my-4" color="backing">
         <v-card-title>
           <span v-html="currentMessage"></span>
         </v-card-title>
@@ -17,7 +17,7 @@
         </v-card-text>
       </v-card>
       <!-- Game Slots -->
-      <v-simple-table>
+      <v-simple-table class="backing">
         <template v-slot:default>
           <tbody>
             <tr v-for="item in playerStates" :key="item.username">
@@ -66,30 +66,33 @@
           <v-row>
             <v-col col="6">
               <v-btn
+                color="buttons"
                 block
                 :disabled="
                   username !== activePlayer || numberOfRoses <= 0
                 "
                 @click="playCard('rose')"
               >
-                Play Rose ({{ numberOfRoses }})
+                Shell ({{ numberOfRoses }})
               </v-btn>
             </v-col>
             <v-col col="6">
               <v-btn
+                color="buttons"
                 block
                 :disabled="
                   username !== activePlayer || numberOfSkulls <= 0
                 "
                 @click="playCard('skull')"
               >
-                Play Skull ({{ numberOfSkulls }})
+                Crab ({{ numberOfSkulls }})
               </v-btn>
             </v-col>
           </v-row>
           <v-row>
             <v-col>
               <v-btn
+                color="buttons"
                 block
                 :disabled="
                   placingCardsVariables.round === 0 ||
@@ -129,10 +132,16 @@
           </v-row>
           <v-row v-if="initiateBiddingMode">
             <v-col>
-              <v-btn block @click="confirmBid"> Confirm </v-btn>
+              <v-btn color="buttons" block @click="confirmBid">
+                Confirm
+              </v-btn>
             </v-col>
             <v-col>
-              <v-btn block @click="initiateBiddingMode = false">
+              <v-btn
+                color="buttons"
+                block
+                @click="initiateBiddingMode = false"
+              >
                 Back
               </v-btn>
             </v-col>
@@ -140,6 +149,7 @@
           <v-row v-if="gamePhase === 'bid'">
             <v-col>
               <v-btn
+                color="buttons"
                 block
                 :disabled="username !== activePlayer"
                 @click="confirmBid"
@@ -149,6 +159,7 @@
             </v-col>
             <v-col>
               <v-btn
+                color="buttons"
                 block
                 :disabled="username !== activePlayer"
                 @click="passBid"
@@ -252,7 +263,9 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-btn @click="restartGame()"> Play again </v-btn>
+            <v-btn color="buttons" @click="restartGame()">
+              Play again
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>

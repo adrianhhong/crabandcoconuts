@@ -45,7 +45,7 @@ export default {
         case 2:
           return { icon: 'mdi-flower-poppy', isOutlined: false };
         case 3:
-          return { icon: 'mdi-skull', isOutlined: false };
+          return { icon: '$crab', isOutlined: false };
         case 4:
           return { icon: 'mdi-window-close', isOutlined: true };
         default:
