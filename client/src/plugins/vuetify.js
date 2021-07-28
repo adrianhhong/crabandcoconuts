@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib/framework';
-import CrabIcon from '../components/Icons/IconCrab.vue';
+import IconCrab from '../components/Icons/IconCrab.vue';
+import IconPearl from '../components/Icons/IconPearl.vue';
+import IconShell from '../components/Icons/IconShell.vue';
 
 Vue.use(Vuetify);
 
@@ -54,7 +56,13 @@ export default new Vuetify({
   icons: {
     values: {
       crab: {
-        component: CrabIcon,
+        component: IconCrab,
+      },
+      pearl: {
+        component: IconPearl,
+      },
+      shell: {
+        component: IconShell,
       },
     },
   },

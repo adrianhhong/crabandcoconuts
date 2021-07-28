@@ -89,6 +89,13 @@
         </v-col>
       </v-row>
       <v-row>
+        <v-col align="center" justify="center">
+          <v-btn rounded @click.stop="showInstructions = true" icon>
+            <v-icon> mdi-book-open-variant </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row no-gutters>
         <v-col class="text-center">
           <small
             >Based on the original
@@ -133,6 +140,108 @@
         </v-btn>
       </template>
     </v-snackbar>
+    <v-dialog v-model="showInstructions" width="800">
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          How to Play <v-spacer></v-spacer
+          ><v-btn icon @click="showInstructions = false"
+            ><v-icon> mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text class="pt-4">
+          <h2>Object of the game</h2>
+          <span
+            >Win X number of Pearls by succeeding in X challenges, or
+            be the last non-eliminated player.</span
+          >
+          <br />
+          <br />
+          <br />
+          <h2>Gameplay</h2>
+          <h3>Step 1 - Turn preparation</h3>
+          <span
+            >Each player chooses one of their items (Shell or Crab) to
+            place into their first sand pile. Once each player has
+            placed one item, play moves on to <b>step 2.</b></span
+          >
+          <br />
+          <br />
+          <h3>Step 2 - Adding or Challenge</h3>
+          <h4><u>Adding</u></h4>
+          <span>
+            If they so want, the first player can add
+            <b>an extra item</b>, to the right of their first sand
+            pile. The next player can then do the same,
+            <b>and so on</b>. This can continue around multiple times.
+          </span>
+          <h4><u>Challenge</u></h4>
+          <span>
+            If a player <b>cannot or does not want to</b> play an
+            additional item, the player
+            <b>issues a challenge.</b> They announce the number of
+            Shells they think they can reveal from among all those
+            played. Then, each subsequent player must:
+            <ul>
+              <li>
+                <b>Increase the bid</b> on the previous challenge by
+                announcing a greater number.
+              </li>
+              <li>
+                <b>Or pass</b> if they do not think they can reveal a
+                greater amount of Shells.
+              </li>
+            </ul>
+            Play proceeds until all players pass, save one:
+            <b>the player who bid the highest</b>, called the
+            <b>Challenger</b>.
+          </span>
+          <br />
+          <br />
+          <h3>Step 3 - The attempt</h3>
+          <span
+            ><b>The Challenger must flip</b> a number of sand piles
+            equal to their challenge while respecting the following
+            rules:
+            <ul>
+              <li>
+                The player <b>begins</b> by flipping
+                <b>all of THEIR own discs</b>.
+              </li>
+              <li>
+                They <b>continue</b> to flip discs with those of the
+                other players, and in the order they choose.
+              </li>
+            </ul>
+          </span>
+          <h4><u>Failed attempt</u></h4>
+          <span
+            ><b>ONE CRAB</b> was flipped: the Challenger has
+            <b>FAILED</b>. The challenger loses one item for good. If
+            they flipped their own Crab, they choose which item to
+            remove. If they flipped someone elses Crab, they lose a
+            random item. If the Challenger loses their
+            <b>last item</b>, they are <b>eliminated</b>. If all
+            players except one have been eliminated, the last
+            non-eliminated player wins!</span
+          >
+          <h4><u>Successful attempt</u></h4>
+          <span
+            ><b>NO CRAB</b> was flipped: the Challenger has
+            <b>SUCCEEDED</b>. The Challenger gains a Pearl. First to X
+            number of Pearls wins!
+          </span>
+          <br />
+          <br />
+          <h3>Step 4 - New round</h3>
+          <span
+            >Whether they've succeeded or failed,
+            <b>the Challenger is the first player</b> of the following
+            round, which resumes on <b>step 1</b>.</span
+          >
+        </v-card-text>
+        <v-divider></v-divider>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -154,6 +263,7 @@ export default {
       },
       errorMessage: '',
       snackbarShow: false,
+      showInstructions: false,
     };
   },
   created: function () {

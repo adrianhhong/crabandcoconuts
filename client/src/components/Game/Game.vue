@@ -23,7 +23,7 @@
             <tr v-for="item in playerStates" :key="item.username">
               <td class="pr-1">{{ item.username }}</td>
               <td class="px-1">
-                <v-icon> mdi-trophy </v-icon>
+                <v-icon> $pearl </v-icon>
                 {{ item.points }}
               </td>
               <td class="px-1 py-3">
