@@ -10,7 +10,7 @@ export default new Vuetify({
     options: { customProperties: true, variations: true },
     themes: {
       light: {
-        primary: '#EB973D',
+        primary: '#c46200',
         secondary: '#424242',
         backing: '#F5F5F5',
         buttons: '#E0E0E0',

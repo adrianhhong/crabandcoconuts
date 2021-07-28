@@ -203,10 +203,23 @@
         </v-container>
         <v-container
           v-if="
-            gamePhase === 'removeCardsPick' &&
-            activePlayer === username
+            gamePhase === 'gainPoint' && activePlayer === username
           "
         >
+          <v-row>
+            <v-col>
+              <v-btn block @click="approveGainPoint()"> OK! </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container v-if="gamePhase === 'loseRandom'">
+          <v-row>
+            <v-col>
+              <v-btn block @click="approveLoseRandom()"> OK! </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
+        <v-container v-if="gamePhase === 'removeCardsPick'">
           <v-row>
             <v-col>
               <v-btn
@@ -215,7 +228,7 @@
                 :disable="removeCardsVariables.totalRoses === 0"
                 @click="removePick('rose')"
               >
-                Remove Rose ({{ removeCardsVariables.totalRoses }})
+                Remove Shell ({{ removeCardsVariables.totalRoses }})
               </v-btn></v-col
             >
             <v-col>
@@ -225,7 +238,7 @@
                 :disable="removeCardsVariables.totalSkulls === 0"
                 @click="removePick('skull')"
               >
-                Remove Skull ({{ removeCardsVariables.totalSkulls }})
+                Remove Crab ({{ removeCardsVariables.totalSkulls }})
               </v-btn></v-col
             >
           </v-row>
@@ -402,6 +415,18 @@ export default {
         this.$socket.client.emit('flipOver', {
           username: playerState.username,
         });
+      });
+    },
+
+    approveGainPoint: function () {
+      this.debounceClick(() => {
+        this.$socket.client.emit('approveGainPoint', {});
+      });
+    },
+
+    approveLoseRandom: function () {
+      this.debounceClick(() => {
+        this.$socket.client.emit('approveLoseRandom', {});
       });
     },
 
