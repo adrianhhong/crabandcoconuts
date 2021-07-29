@@ -22,6 +22,7 @@ export default class Room {
   cardsFlipped = 0;
   eliminatedPlayers = 0;
   currentMessageRandomlyLose = '';
+  pointsToWin = 2;
 
   constructor(
     io: RoomType['io'],
@@ -66,11 +67,17 @@ export default class Room {
    * @param newPlayer Player instance
    */
   setPlayerSockets(newPlayer: Player): void {
+    // changePointsToWin: host changes points needed to win option
+    newPlayer.socket.on('changePointsToWin', ({ pointsToWin }) => {
+      this.pointsToWin = pointsToWin;
+      this.emitUpdatedLobby();
+    });
+
     // disconnect: When a player disconnects, remove player from room
     newPlayer.socket.on('disconnect', () => {
       logger.info(`${newPlayer.username} disconnected`);
       this.removePlayer(newPlayer.username);
-      this.emitUpdatedPlayerList();
+      this.emitUpdatedLobby();
     });
 
     // playCard: When a player plays a card (skull or rose) update their hiddenSlots and slots
@@ -275,7 +282,7 @@ export default class Room {
     if (this.cardsFlipped === this.currentBidNumber) {
       newPlayer.points++;
       // Check if player won
-      if (newPlayer.points === 2) {
+      if (newPlayer.points === this.pointsToWin) {
         this.playerWins(newPlayer, 'points');
         return;
       }
@@ -329,7 +336,7 @@ export default class Room {
     // Has more than 1 card left, needs to choose a card to remove
     this.emitGameState(
       `<span class="${current.color}--text">${current.username}</span> is choosing an item to remove`,
-      `<span class="${current.color}--text">${current.username}</span> flipped <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s crab`,
+      `<span class="${current.color}--text">${current.username}</span> flipped <span class="${flippedPlayer.color}--text">their own</span> crab`,
       'removeCardsPick',
       undefined,
       undefined,
@@ -441,7 +448,7 @@ export default class Room {
   }
 
   playerWins(winningPlayer: Player, reason: string): void {
-    let logMessage = `<span class="${winningPlayer.color}--text">${winningPlayer.username}</span> reached 2 points!`;
+    let logMessage = `<span class="${winningPlayer.color}--text">${winningPlayer.username}</span> reached ${this.pointsToWin} pearls!`;
     if (reason === 'eliminated') {
       logMessage = `All other players have no items left and have beeen eliminated`;
     }
@@ -456,10 +463,11 @@ export default class Room {
     );
   }
 
-  emitUpdatedPlayerList(): void {
-    this.io.in(this.roomId).emit('updatePlayerList', {
+  emitUpdatedLobby(): void {
+    this.io.in(this.roomId).emit('updateLobby', {
       usernames: this.getUsernames(),
       hostUsername: this.host.username,
+      pointsToWin: this.pointsToWin,
     });
   }
 

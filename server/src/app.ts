@@ -75,9 +75,9 @@ io.on('connection', async (socket: Socket) => {
       socket['id'],
     );
     if (userExists) {
-      foundRoom?.emitUpdatedPlayerList();
+      foundRoom?.emitUpdatedLobby();
     } else {
-      socket.emit('updatePlayerList', { usernames: null });
+      socket.emit('updateLobby', { usernames: null });
     }
   });
 
@@ -89,7 +89,7 @@ io.on('connection', async (socket: Socket) => {
     if (userExists) {
       foundRoom?.removePlayer(username);
     }
-    foundRoom?.emitUpdatedPlayerList();
+    foundRoom?.emitUpdatedLobby();
   });
 
   socket.on('roomStart', ({ roomId }) => {

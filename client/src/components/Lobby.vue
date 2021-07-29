@@ -28,34 +28,81 @@
       <v-row>
         <v-col>
           <v-card class="mx-auto" max-width="300" tile>
-            <v-list disabled>
-              <v-subheader>Players</v-subheader>
-              <v-list-item-group>
-                <v-list-item v-for="(p, i) in usernames" :key="i">
-                  <v-badge
-                    v-if="p === username"
-                    color="primary"
-                    content="me"
-                  >
-                    <v-list-item-title
+            <v-card-text>
+              <p class="text-h6 text--primary">Players</p>
+              <v-list disabled>
+                <v-list-item-group>
+                  <v-list-item v-for="(p, i) in usernames" :key="i">
+                    <v-badge
                       v-if="p === username"
-                      class="font-weight-black"
+                      color="primary"
+                      content="me"
+                    >
+                      <v-list-item-title
+                        v-if="p === username"
+                        v-text="p"
+                        style="text-align: left"
+                      >
+                      </v-list-item-title
+                    ></v-badge>
+                    <v-list-item-title
+                      v-if="p !== username"
                       v-text="p"
                       style="text-align: left"
-                    >
-                    </v-list-item-title
-                  ></v-badge>
-                  <v-list-item-title
-                    v-if="p !== username"
-                    v-text="p"
-                    style="text-align: left"
-                  ></v-list-item-title>
-                </v-list-item>
-              </v-list-item-group>
-            </v-list>
+                    ></v-list-item-title>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </v-card-text>
           </v-card>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-card max-width="300" class="mx-auto">
+            <v-card-text>
+              <p class="text-h6 text--primary">Options</p>
+              <div>Pearls to Win</div>
+              <v-row class="text-center">
+                <v-col>
+                  <v-row>
+                    <v-col>
+                      <v-btn
+                        icon
+                        :disabled="
+                          username !== hostUsername ||
+                          pointsToWin === 1
+                        "
+                      >
+                        <v-icon @click="changePointsToWin(-1)">
+                          mdi-minus
+                        </v-icon>
+                      </v-btn>
+                    </v-col>
+                    <v-col>
+                      <h2>{{ pointsToWin }}</h2>
+                    </v-col>
+                    <v-col>
+                      <v-btn
+                        icon
+                        :disabled="
+                          username !== hostUsername ||
+                          pointsToWin === 10
+                        "
+                      >
+                        <v-icon @click="changePointsToWin(1)">
+                          mdi-plus
+                        </v-icon>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
       <v-row>
         <v-col class="text-right">
           <v-btn
@@ -122,6 +169,7 @@ export default {
       usernames: [],
       showLoaderText: false,
       hostUsername: '',
+      pointsToWin: 2,
     };
   },
   beforeCreate: function () {
@@ -133,6 +181,17 @@ export default {
     });
   },
   methods: {
+    changePointsToWin: function (amount) {
+      if (amount === 1 && this.pointsToWin < 10) {
+        this.pointsToWin++;
+      }
+      if (amount === -1 && this.pointsToWin > 1) {
+        this.pointsToWin--;
+      }
+      this.$socket.client.emit('changePointsToWin', {
+        pointsToWin: this.pointsToWin,
+      });
+    },
     /**
      * Prevents button being clicked multiple times sending multiple requests to the server
      */
@@ -162,10 +221,12 @@ export default {
     },
   },
   sockets: {
-    updatePlayerList: function ({ usernames, hostUsername }) {
+    updateLobby: function ({ usernames, hostUsername, pointsToWin }) {
       this.hostUsername = hostUsername;
+      this.pointsToWin = pointsToWin;
       if (usernames === null) {
         this.$router.push('/');
+        return;
       }
       if (usernames instanceof Array) {
         this.usernames = usernames;

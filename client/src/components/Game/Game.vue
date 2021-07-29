@@ -266,7 +266,7 @@
         </v-container>
       </div>
       <div v-if="isEliminated && gamePhase !== 'playerWins'">
-        <h1>you have been eliminated</h1>
+        <h1>You have been eliminated</h1>
       </div>
       <v-container v-if="gamePhase === 'playerWins'">
         <v-row>

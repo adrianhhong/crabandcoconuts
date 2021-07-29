@@ -90,7 +90,7 @@
       </v-row>
       <v-row>
         <v-col align="center" justify="center">
-          <v-btn rounded @click.stop="showInstructions = true" icon>
+          <v-btn @click.stop="showInstructions = true" icon>
             <v-icon> mdi-book-open-variant </v-icon>
           </v-btn>
         </v-col>
@@ -345,11 +345,12 @@ export default {
     /**
      * On successfully created room, commit username and roomId to store, and route to room
      */
-    enterRoomSuccess: function ({ username, roomId }) {
+    enterRoomSuccess: function ({ username, roomId, pointsToWin }) {
       this.stopButtonRequests = false;
       this.$store.commit('mutatePlayerDetails', {
         username: username,
         roomId: roomId,
+        pointsToWin: pointsToWin,
       });
       this.$router.push(`/${roomId}`);
     },
