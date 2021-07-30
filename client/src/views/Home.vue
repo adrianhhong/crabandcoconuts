@@ -17,7 +17,7 @@
           rounded
           v-model="username"
           label="Enter your name"
-          maxlength="15"
+          maxlength="10"
           :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
         ></v-text-field>
       </v-form>
@@ -255,7 +255,7 @@ export default {
       roomId: '',
       rules: {
         nameRequired: (v) => !!v || 'Please enter a name',
-        nameMax: (v) => v.length <= 15 || 'Max 15 characters',
+        nameMax: (v) => v.length <= 10 || 'Max 10 characters',
         nameMin: (v) => v.trim().length > 0 || 'Please enter a name',
         roomIdRequired: (v) => !!v || 'Please enter a room ID',
         roomIdLength: (v) =>

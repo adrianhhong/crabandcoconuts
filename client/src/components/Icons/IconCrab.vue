@@ -1,6 +1,6 @@
 <template>
   <svg
-    class="filter-color"
+    class="svg"
     id="ICONS"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
@@ -29,9 +29,8 @@
 </template>
 
 <style>
-.filter-color {
-  filter: invert(100%) sepia(0%) saturate(7500%) hue-rotate(301deg)
-    brightness(102%) contrast(105%);
+.svg path {
+  fill: black !important;
 }
 .cls-1,
 .cls-2,
@@ -39,11 +38,12 @@
   stroke: #000;
   stroke-miterlimit: 10;
 }
-.cls-2 {
-  stroke-linecap: round;
-}
 .cls-2,
 .cls-3 {
+  fill: none;
   stroke-width: 1.2px;
+}
+.cls-2 {
+  stroke-linecap: round;
 }
 </style>

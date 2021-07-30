@@ -43,7 +43,7 @@ export default {
         case 1:
           return { icon: '', isOutlined: false };
         case 2:
-          return { icon: '$shell', isOutlined: false };
+          return { icon: '$coconut', isOutlined: false };
         case 3:
           return { icon: '$crab', isOutlined: false };
         case 4:

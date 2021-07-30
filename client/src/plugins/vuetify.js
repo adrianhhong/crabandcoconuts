@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuetify from 'vuetify/lib/framework';
 import IconCrab from '../components/Icons/IconCrab.vue';
 import IconPearl from '../components/Icons/IconPearl.vue';
-import IconShell from '../components/Icons/IconShell.vue';
+import IconCoconut from '../components/Icons/IconCoconut.vue';
 
 Vue.use(Vuetify);
 
@@ -16,12 +16,12 @@ export default new Vuetify({
         secondary: '#424242',
         backing: '#F5F5F5',
         buttons: '#E0E0E0',
-        player1: '#BF5FBF',
+        player1: '#F0727C',
         player2: '#779AED',
         player3: '#8AD172',
-        player4: '#F6A974',
-        player5: '#E4DA7A',
-        player6: '#F0727C',
+        player4: '#BF5FBF',
+        player5: '#F6A974',
+        player6: '#E4DA7A',
 
         // player1: '#ffadad',
         // player2: '#ffd6a5',
@@ -61,8 +61,8 @@ export default new Vuetify({
       pearl: {
         component: IconPearl,
       },
-      shell: {
-        component: IconShell,
+      coconut: {
+        component: IconCoconut,
       },
     },
   },

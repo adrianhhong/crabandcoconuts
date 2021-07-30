@@ -113,7 +113,13 @@
             "
           >
             <v-col cols="5">
-              <v-btn icon :disabled="username !== activePlayer">
+              <v-btn
+                icon
+                :disabled="
+                  username !== activePlayer ||
+                  bidNumber === bidVariables.biddingMinimum
+                "
+              >
                 <v-icon @click="changeBidNumber(-1)">
                   mdi-minus
                 </v-icon>
@@ -123,7 +129,13 @@
               <h2>{{ bidNumber }}</h2>
             </v-col>
             <v-col cols="5">
-              <v-btn icon :disabled="username !== activePlayer">
+              <v-btn
+                icon
+                :disabled="
+                  username !== activePlayer ||
+                  bidNumber === bidVariables.cardsPlayed
+                "
+              >
                 <v-icon @click="changeBidNumber(1)">
                   mdi-plus
                 </v-icon>
@@ -175,30 +187,36 @@
           "
         >
           <v-row>
-            <v-col
-              v-for="player in playerStates"
-              :key="player.username"
-              :cols="Math.floor(12 / playerStates.length)"
-            >
-              <v-btn
-                :value="player.username"
-                :color="player.color"
-                block
-                :disabled="
-                  (player.username !== username &&
-                    !flippedOverAllMyOwn) ||
-                  (player.username !== username &&
-                    player.nextToFlipIndex === -1) ||
-                  (player.username === username &&
-                    flippedOverAllMyOwn)
-                "
-                @click="flipOver(player)"
+            <template v-for="player in playerStates">
+              <v-col
+                :key="player.username"
+                cols="12"
+                xs="12"
+                sm="6"
+                md="6"
+                lg="6"
+                xl="6"
               >
-                {{ player.username }} ({{
-                  player.nextToFlipIndex + 1
-                }})
-              </v-btn>
-            </v-col>
+                <v-btn
+                  :value="player.username"
+                  :color="player.color"
+                  block
+                  :disabled="
+                    (player.username !== username &&
+                      !flippedOverAllMyOwn) ||
+                    (player.username !== username &&
+                      player.nextToFlipIndex === -1) ||
+                    (player.username === username &&
+                      flippedOverAllMyOwn)
+                  "
+                  @click="flipOver(player)"
+                >
+                  {{ player.username }} ({{
+                    player.nextToFlipIndex + 1
+                  }})
+                </v-btn>
+              </v-col>
+            </template>
           </v-row>
         </v-container>
         <v-container
@@ -249,19 +267,25 @@
           "
         >
           <v-row>
-            <v-col
-              v-for="player in playerStatesWithoutEliminated"
-              :key="player.username"
-              :cols="Math.floor(12 / playerStates.length)"
-            >
-              <v-btn
-                :value="player.username"
-                :color="player.color"
-                @click="startNextRound(player)"
+            <template v-for="player in playerStatesWithoutEliminated">
+              <v-col
+                :key="player.username"
+                cols="12"
+                xs="12"
+                sm="6"
+                md="6"
+                lg="6"
+                xl="6"
               >
-                {{ player.username }}
-              </v-btn>
-            </v-col>
+                <v-btn
+                  :value="player.username"
+                  :color="player.color"
+                  @click="startNextRound(player)"
+                >
+                  {{ player.username }}
+                </v-btn>
+              </v-col>
+            </template>
           </v-row>
         </v-container>
       </div>
