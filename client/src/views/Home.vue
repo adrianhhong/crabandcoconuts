@@ -3,7 +3,7 @@
     <v-container style="max-width: 600px">
       <v-row>
         <v-col>
-          <h1 class="text-center">crab & shells</h1>
+          <h1 class="text-center">crab & coconuts</h1>
         </v-col>
       </v-row>
       <v-row>
@@ -160,8 +160,8 @@
           <h2>Gameplay</h2>
           <h3>Step 1 - Turn preparation</h3>
           <span
-            >Each player chooses one of their items (Shell or Crab) to
-            place into their first sand pile. Once each player has
+            >Each player chooses one of their items (Coconut or Crab)
+            to place into their first sand pile. Once each player has
             placed one item, play moves on to <b>step 2.</b></span
           >
           <br />
@@ -179,7 +179,7 @@
             If a player <b>cannot or does not want to</b> play an
             additional item, the player
             <b>issues a challenge.</b> They announce the number of
-            Shells they think they can reveal from among all those
+            Coconuts they think they can reveal from among all those
             played. Then, each subsequent player must:
             <ul>
               <li>
@@ -188,7 +188,7 @@
               </li>
               <li>
                 <b>Or pass</b> if they do not think they can reveal a
-                greater amount of Shells.
+                greater amount of Coconuts.
               </li>
             </ul>
             Play proceeds until all players pass, save one:

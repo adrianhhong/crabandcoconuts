@@ -73,7 +73,7 @@
                 "
                 @click="playCard('rose')"
               >
-                Shell ({{ numberOfRoses }})
+                Coconut ({{ numberOfRoses }})
               </v-btn>
             </v-col>
             <v-col col="6">
@@ -246,7 +246,7 @@
                 :disable="removeCardsVariables.totalRoses === 0"
                 @click="removePick('rose')"
               >
-                Remove Shell ({{ removeCardsVariables.totalRoses }})
+                Remove coconut ({{ removeCardsVariables.totalRoses }})
               </v-btn></v-col
             >
             <v-col>

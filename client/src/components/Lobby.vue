@@ -3,7 +3,7 @@
     <v-container style="max-width: 600px">
       <v-row>
         <v-col>
-          <h1 class="text-center">crab & shells</h1>
+          <h1 class="text-center">crab & coconuts</h1>
         </v-col>
       </v-row>
       <v-row>

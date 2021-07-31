@@ -82,21 +82,20 @@ export default class Room {
 
     // playCard: When a player plays a card (skull or rose) update their hiddenSlots and slots
     newPlayer.socket.on('playCard', ({ card }) => {
-      // Set hiddenSlots and numberOfRoses/Skulls
-      if (card === 'skull') {
-        this.players[this.activePlayerIndex].hiddenSlots[
-          this.round
-        ] = 1;
-        this.players[this.activePlayerIndex].numberOfSkulls--;
+      const activePlayer = this.players[this.activePlayerIndex];
+      if (activePlayer) {
+        if (card === 'skull') {
+          // Set hiddenSlots and numberOfRoses/Skulls
+          activePlayer.hiddenSlots[this.round] = 1;
+          activePlayer.numberOfSkulls--;
+        }
+        if (card === 'rose') {
+          activePlayer.hiddenSlots[this.round] = 2;
+          activePlayer.numberOfRoses--;
+        }
+        // Set slots
+        activePlayer.slots[this.round] = 1;
       }
-      if (card === 'rose') {
-        this.players[this.activePlayerIndex].hiddenSlots[
-          this.round
-        ] = 2;
-        this.players[this.activePlayerIndex].numberOfRoses--;
-      }
-      // Set slots
-      this.players[this.activePlayerIndex].slots[this.round] = 1;
       // Record previous variables
       const previous = this.getActiveDetails();
       // Increase cardsPlayed
@@ -274,7 +273,7 @@ export default class Room {
         }</span> needs to flip over ${
           this.currentBidNumber - this.cardsFlipped
         } more`,
-        `<span class="${current.color}--text">${current.username}</span> flipped over <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s shell on flip ${this.cardsFlipped}`,
+        `<span class="${current.color}--text">${current.username}</span> flipped over <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s coconut on flip ${this.cardsFlipped}`,
         'challenge',
       );
     }
@@ -289,7 +288,7 @@ export default class Room {
       const current = this.getActiveDetails();
       this.emitGameState(
         `<span class="${current.color}--text">${current.username}</span> was successful at flipping over ${this.cardsFlipped} sand piles and has gained a pearl!`,
-        `<span class="${current.color}--text">${current.username}</span> flipped over <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s shell on flip ${this.cardsFlipped}`,
+        `<span class="${current.color}--text">${current.username}</span> flipped over <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s coconut on flip ${this.cardsFlipped}`,
         'gainPoint',
       );
     }
