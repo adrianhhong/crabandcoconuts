@@ -27,39 +27,72 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-card class="mx-auto" max-width="300" tile>
+          <v-card class="mx-auto" max-width="400" tile>
             <v-card-text>
               <p class="text-h6 text--primary">Players</p>
-              <v-list disabled>
-                <v-list-item-group>
-                  <v-list-item v-for="(p, i) in usernames" :key="i">
-                    <v-badge
-                      v-if="p === username"
-                      color="primary"
-                      content="me"
-                    >
-                      <v-list-item-title
-                        v-if="p === username"
-                        v-text="p"
-                        style="text-align: left"
-                      >
-                      </v-list-item-title
-                    ></v-badge>
-                    <v-list-item-title
-                      v-if="p !== username"
-                      v-text="p"
-                      style="text-align: left"
-                    ></v-list-item-title>
-                  </v-list-item>
-                </v-list-item-group>
-              </v-list>
+              <v-row>
+                <v-col cols="6">
+                  <v-list disabled>
+                    <v-list-item-group>
+                      <div v-for="(p, i) in usernames" :key="i">
+                        <v-list-item v-if="i % 2 === 0">
+                          <v-badge
+                            v-if="p === username"
+                            color="primary"
+                            content="me"
+                          >
+                            <v-list-item-title
+                              v-if="p === username"
+                              v-text="p"
+                              style="text-align: left"
+                            >
+                            </v-list-item-title
+                          ></v-badge>
+                          <v-list-item-title
+                            v-if="p !== username"
+                            v-text="p"
+                            style="text-align: left"
+                          ></v-list-item-title>
+                        </v-list-item>
+                      </div>
+                    </v-list-item-group>
+                  </v-list>
+                </v-col>
+                <v-col col="6">
+                  <v-list disabled>
+                    <v-list-item-group>
+                      <div v-for="(p, i) in usernames" :key="i">
+                        <v-list-item v-if="i % 2 === 1">
+                          <v-badge
+                            v-if="p === username"
+                            color="primary"
+                            content="me"
+                          >
+                            <v-list-item-title
+                              v-if="p === username"
+                              v-text="p"
+                              style="text-align: left"
+                            >
+                            </v-list-item-title
+                          ></v-badge>
+                          <v-list-item-title
+                            v-if="p !== username"
+                            v-text="p"
+                            style="text-align: left"
+                          ></v-list-item-title>
+                        </v-list-item>
+                      </div>
+                    </v-list-item-group>
+                  </v-list>
+                </v-col>
+              </v-row>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <v-card max-width="300" class="mx-auto">
+          <v-card max-width="400" class="mx-auto">
             <v-card-text>
               <p class="text-h6 text--primary">Options</p>
               <div>Pearls to Win</div>

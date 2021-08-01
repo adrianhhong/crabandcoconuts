@@ -34,24 +34,28 @@ io.on('connection', async (socket: Socket) => {
           socket.emit('joinRoomFail', {
             message: 'Room cannot be found',
           });
+          return;
         }
-        if (foundRoom !== null) {
-          // check if name is valid
-          const usernameDuplicated =
-            foundRoom.checkIfDuplicateUsername(username);
-          if (usernameDuplicated) {
-            socket.emit('joinRoomFail', {
-              message: 'Name already taken',
-            });
-          } else {
-            foundRoom.addPlayer(username, socket);
-            socket.emit('enterRoomSuccess', {
-              username: username,
-              roomId: foundRoom.roomId,
-            });
-            logger.info(`${username} joined ${roomId}`);
-          }
+        const usernameDuplicated =
+          foundRoom.checkIfDuplicateUsername(username);
+        if (usernameDuplicated) {
+          socket.emit('joinRoomFail', {
+            message: 'Name already taken',
+          });
+          return;
         }
+        if (foundRoom.players.length === 10) {
+          socket.emit('joinRoomFail', {
+            message: 'Room capacity full',
+          });
+          return;
+        }
+        foundRoom.addPlayer(username, socket);
+        socket.emit('enterRoomSuccess', {
+          username: username,
+          roomId: foundRoom.roomId,
+        });
+        logger.info(`${username} joined ${roomId}`);
       }
       // ! Remove for PROD
       if (enterRoomAction === 'createDev') {
