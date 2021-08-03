@@ -3,8 +3,8 @@
     <v-container class="text-center" style="max-width: 600px">
       <!-- Messages -->
       <v-card height="180" class="my-4" color="backing">
-        <v-card-title>
-          <span v-html="currentMessage"></span>
+        <v-card-title class="text-left">
+          <h5 v-html="currentMessage"></h5>
         </v-card-title>
         <v-card-text
           style="max-height: 105px; overflow-y: auto"
@@ -226,14 +226,14 @@
         >
           <v-row>
             <v-col>
-              <v-btn block @click="approveGainPoint()"> OK! </v-btn>
+              <v-btn block @click="approveGainPoint()"> OK </v-btn>
             </v-col>
           </v-row>
         </v-container>
         <v-container v-if="gamePhase === 'loseRandom'">
           <v-row>
             <v-col>
-              <v-btn block @click="approveLoseRandom()"> OK! </v-btn>
+              <v-btn block @click="approveLoseRandom()"> OK </v-btn>
             </v-col>
           </v-row>
         </v-container>
@@ -246,7 +246,7 @@
                 :disable="removeCardsVariables.totalRoses === 0"
                 @click="removePick('rose')"
               >
-                Remove coconut ({{ removeCardsVariables.totalRoses }})
+                Remove Coconut ({{ removeCardsVariables.totalRoses }})
               </v-btn></v-col
             >
             <v-col>
@@ -289,7 +289,10 @@
           </v-row>
         </v-container>
       </div>
-      <div v-if="isEliminated && gamePhase !== 'playerWins'">
+      <div
+        class="pt-3"
+        v-if="isEliminated && gamePhase !== 'playerWins'"
+      >
         <h1>You have been eliminated</h1>
       </div>
       <v-container v-if="gamePhase === 'playerWins'">
