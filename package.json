@@ -7,9 +7,14 @@
     "serve-client": "vue-cli-service serve",
     "build-client": "vue-cli-service build",
     "lint-client": "vue-cli-service lint",
-    "start": "nodemon --config nodemon.json ./app.ts",
+    "serve-server": "nodemon --config nodemon.json ./app.ts",
     "start:debug": "nodemon --config nodemon.json --inspect-brk ./src/app.ts",
-    "lint-server": "eslint"
+    "lint-server": "eslint",
+    "start": "node dist/app.js",
+    "postinstall": "tsc && npm run build-client"
+  },
+  "engines": {
+    "node": "16.2.0"
   },
   "nodemonConfig": {
     "restartable": "rs",
