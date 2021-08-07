@@ -1,6 +1,7 @@
 import { Socket, Server } from 'socket.io';
 import express from 'express';
 import { createServer } from 'http';
+import path from 'path';
 
 import { server as serverConfig } from './config';
 import Game from './services/game';
@@ -8,6 +9,15 @@ import logger from './lib/logger';
 
 // Start express server
 const app = express();
+
+app.listen(serverConfig.apiPort, () => {
+  // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
+});
+
+// Serve static web files
+app.use(express.static(__dirname + '/dist'));
+app.use(express.static(path.join(__dirname, '/../client/dist')));
+
 // Start http server and then create a new Socket.IO server
 const server = createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
@@ -105,10 +115,3 @@ io.on('connection', async (socket: Socket) => {
 server.listen(serverConfig.socketPort, () => {
   // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
-
-app.listen(serverConfig.apiPort, () => {
-  // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
-});
-
-// app.use('/', function (req, res, next) {
-// });

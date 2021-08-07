@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-/dist
+# /dist # Keep /dist so heroku can serve it for front end
 
 
 # local env files

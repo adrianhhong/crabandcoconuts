@@ -1,0 +1,19 @@
+{
+  "name": "skull",
+  "version": "0.1.0",
+  "description": "Skull board game",
+  "scripts": {
+    "build": "cd client && npm run build",
+    "start": "cd server && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adrianhhong/skull.git"
+  },
+  "author": "Adrian Hong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adrianhhong/skull/issues"
+  },
+  "homepage": "https://github.com/adrianhhong/skull#readme"
+}
