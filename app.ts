@@ -14,7 +14,7 @@ app.listen(serverConfig.apiPort, () => {
 });
 
 // Serve static web files
-app.use(express.static(__dirname + '/dist/dist'));
+app.use(express.static(__dirname + '/dist'));
 
 // Start http server and then create a new Socket.IO server
 const server = createServer(app);

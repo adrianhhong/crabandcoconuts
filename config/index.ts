@@ -1,5 +1,5 @@
 export const server = {
-  socketPort: parseInt(`${process.env.SOCKET_PORT}`, 10) || 5000,
+  socketPort: 5000,
   apiPort: process.env.PORT || 3000,
   logLevel: 'debug',
 };
