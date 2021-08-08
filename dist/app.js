@@ -20,15 +20,15 @@ const game_1 = __importDefault(require("./services/game"));
 const logger_1 = __importDefault(require("./lib/logger"));
 // Start express server
 const app = express_1.default();
-// app.listen(serverConfig.apiPort, () => {
-//   // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
-// });
+app.listen(config_1.server.apiPort, () => {
+    // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
+});
 // Serve static web files
 app.use(express_1.default.static(__dirname + '/dist/dist'));
 // Start http server and then create a new Socket.IO server
 const server = http_1.createServer(app);
 // server.listen(serverConfig.socketPort, () => {
-server.listen(config_1.server.apiPort, () => {
+server.listen(config_1.server.socketPort, () => {
     // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
 const io = new socket_io_1.Server(server, { cors: { origin: '*' } });

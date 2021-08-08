@@ -9,9 +9,9 @@ import logger from './lib/logger';
 // Start express server
 const app = express();
 
-// app.listen(serverConfig.apiPort, () => {
-//   // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
-// });
+app.listen(serverConfig.apiPort, () => {
+  // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
+});
 
 // Serve static web files
 app.use(express.static(__dirname + '/dist/dist'));
@@ -20,7 +20,7 @@ app.use(express.static(__dirname + '/dist/dist'));
 const server = createServer(app);
 
 // server.listen(serverConfig.socketPort, () => {
-server.listen(serverConfig.apiPort, () => {
+server.listen(serverConfig.socketPort, () => {
   // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
 
