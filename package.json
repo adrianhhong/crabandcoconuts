@@ -11,7 +11,7 @@
     "start:debug": "nodemon --config nodemon.json --inspect-brk ./src/app.ts",
     "lint-server": "eslint",
     "start": "node dist/app.js",
-    "postinstall": "tsc && npm run build-client"
+    "postinstall": "tsc && vue-cli-service build"
   },
   "engines": {
     "node": "16.2.0"
