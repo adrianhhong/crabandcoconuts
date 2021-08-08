@@ -1,6 +1,5 @@
 export const server = {
-  socketPort: 5000,
-  apiPort: process.env.PORT || 3000,
+  port: process.env.PORT || 3000,
   logLevel: 'debug',
 };
 

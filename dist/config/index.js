@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.colors = exports.server = void 0;
 exports.server = {
-    socketPort: 5000,
-    apiPort: process.env.PORT || 3000,
+    port: process.env.PORT || 3000,
     logLevel: 'debug',
 };
 exports.colors = [

@@ -10,7 +10,8 @@
     "serve-server": "nodemon --config nodemon.json ./app.ts",
     "start:debug": "nodemon --config nodemon.json --inspect-brk ./src/app.ts",
     "lint-server": "eslint",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "build": "vue-cli-service build && tsc"
   },
   "engines": {
     "node": "16.2.0"
