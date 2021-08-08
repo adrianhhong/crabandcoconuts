@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_1 = require("socket.io");
 const express_1 = __importDefault(require("express"));
 const http_1 = require("http");
-const path_1 = __importDefault(require("path"));
 const config_1 = require("./config");
 const game_1 = __importDefault(require("./services/game"));
 const logger_1 = __importDefault(require("./lib/logger"));
@@ -26,7 +25,6 @@ app.listen(config_1.server.apiPort, () => {
 });
 // Serve static web files
 app.use(express_1.default.static(__dirname + '/dist'));
-app.use(express_1.default.static(path_1.default.join(__dirname, '/../client/dist')));
 // Start http server and then create a new Socket.IO server
 const server = http_1.createServer(app);
 const io = new socket_io_1.Server(server, { cors: { origin: '*' } });
