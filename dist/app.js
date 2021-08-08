@@ -24,10 +24,11 @@ app.listen(config_1.server.apiPort, () => {
     // logger.info(`Api listening on port ${serverConfig.apiPort}!`);
 });
 // Serve static web files
-app.use(express_1.default.static(__dirname + '/dist'));
+if (process.env.NODE_ENV === 'production') {
+    app.use(express_1.default.static(__dirname + '/dist'));
+}
 // Start http server and then create a new Socket.IO server
 const server = http_1.createServer(app);
-// server.listen(serverConfig.socketPort, () => {
 server.listen(config_1.server.socketPort, () => {
     // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });

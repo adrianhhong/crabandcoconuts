@@ -14,12 +14,12 @@ app.listen(serverConfig.apiPort, () => {
 });
 
 // Serve static web files
-app.use(express.static(__dirname + '/dist'));
-
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(__dirname + '/dist'));
+}
 // Start http server and then create a new Socket.IO server
 const server = createServer(app);
 
-// server.listen(serverConfig.socketPort, () => {
 server.listen(serverConfig.socketPort, () => {
   // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
