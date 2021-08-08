@@ -1,7 +1,6 @@
 import { Socket, Server } from 'socket.io';
 import express from 'express';
 import { createServer } from 'http';
-import path from 'path';
 
 import { server as serverConfig } from './config';
 import Game from './services/game';
@@ -19,6 +18,11 @@ app.use(express.static(__dirname + '/dist/dist'));
 
 // Start http server and then create a new Socket.IO server
 const server = createServer(app);
+
+server.listen(serverConfig.socketPort, () => {
+  // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
+});
+
 const io = new Server(server, { cors: { origin: '*' } });
 
 const skull = new Game(io);
@@ -109,8 +113,4 @@ io.on('connection', async (socket: Socket) => {
     const foundRoom = skull.findRoom(roomId);
     foundRoom?.startGame();
   });
-});
-
-server.listen(serverConfig.socketPort, () => {
-  // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
 });
