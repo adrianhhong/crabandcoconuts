@@ -10,7 +10,8 @@ import Clipboard from 'v-clipboard';
 
 Vue.config.productionTip = false;
 
-Vue.use(VueSocketIOExt, io(config.serverUrl), { store });
+Vue.use(VueSocketIOExt, io(), { store });
+// Vue.use(VueSocketIOExt, io(config.serverUrl), { store });
 Vue.use(Clipboard);
 
 new Vue({
