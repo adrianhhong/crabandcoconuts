@@ -28,17 +28,6 @@ export default class Game {
     return newRoom;
   }
 
-  // ! Remove for PROD
-  newRoomDev(): Room {
-    const newRoomId = 'aaaa';
-    const newRoom = new Room(this.io, newRoomId, () => {
-      // will be ran when this room has 0 players left
-      this.removeGame(newRoomId);
-    });
-    this.rooms.push(newRoom);
-    return newRoom;
-  }
-
   findRoom(roomId: RoomType['roomId']): Room | null {
     if (!roomId || roomId.length !== 4) return null;
     for (let i = 0; i < this.rooms.length; i++) {

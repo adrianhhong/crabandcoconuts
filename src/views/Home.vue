@@ -22,6 +22,7 @@
           label="Enter your name"
           maxlength="10"
           :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
+          @keydown.enter.prevent="onCreateGame"
         ></v-text-field>
       </v-form>
       <v-container fluid style="height: 300px">
@@ -31,17 +32,6 @@
               <v-col>
                 <v-btn color="buttons" rounded @click="onCreateGame"
                   >Create</v-btn
-                >
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-btn
-                  color="buttons"
-                  rounded
-                  @click="onCreateDev"
-                  class="mt-3"
-                  >aaaa</v-btn
                 >
               </v-col>
             </v-row>
@@ -61,6 +51,7 @@
                       rules.roomIdRequired,
                       rules.roomIdLength,
                     ]"
+                    @keydown.enter.prevent="onJoinGame"
                   ></v-text-field>
                 </v-form>
                 <v-btn
@@ -72,18 +63,7 @@
                 >
               </v-col>
             </v-row>
-            <v-row>
-              <v-col>
-                <v-btn
-                  color="buttons"
-                  rounded
-                  @click="onJoinDev"
-                  class="mt-3"
-                  >aaaa</v-btn
-                ></v-col
-              ></v-row
-            ></v-col
-          >
+          </v-col>
         </v-row></v-container
       >
       <v-row>
@@ -309,36 +289,6 @@ export default {
         this.$socket.client.emit('homeNewEnterRoom', {
           username: this.username.trim(),
           roomId: this.roomId,
-          enterRoomAction: 'join',
-        });
-      });
-    },
-    // !! Remove for PROD
-    onCreateDev: function () {
-      const isValidated = this.$refs.name.validate();
-      if (!isValidated) {
-        this.stopButtonRequests = false;
-        return;
-      }
-      this.debounceClick(() => {
-        this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.username.trim(),
-          roomId: '',
-          enterRoomAction: 'createDev',
-        });
-      });
-    },
-    // !! Remove for PROD
-    onJoinDev: function () {
-      const nameIsValidated = this.$refs.name.validate();
-      if (!nameIsValidated) {
-        this.stopButtonRequests = false;
-        return;
-      }
-      this.debounceClick(() => {
-        this.$socket.client.emit('homeNewEnterRoom', {
-          username: this.username.trim(),
-          roomId: 'aaaa',
           enterRoomAction: 'join',
         });
       });

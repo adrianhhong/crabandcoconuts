@@ -114,7 +114,7 @@ export default class Room {
         `<span class="${current.color}--text">${current.username}</span>'s turn`,
         `<span class="${previous.color}--text">${
           previous.username
-        }</span> hid an item in sand pile ${previous.round + 1}`,
+        }</span> placed card ${previous.round + 1} down`,
         'placingCards',
       );
     });
@@ -128,15 +128,15 @@ export default class Room {
         const current = this.getActiveDetails();
         this.emitGameState(
           `<span class="${current.color}--text">${current.username}</span>'s turn to increase the bid or pass`,
-          `<span class="${previous.color}--text">${previous.username}</span> bid they can flip ${this.currentBidNumber} sand piles`,
+          `<span class="${previous.color}--text">${previous.username}</span> bid they can flip ${this.currentBidNumber} cards`,
           'bid',
         );
       }
       if (this.currentBidNumber === this.cardsPlayed) {
         this.setupChallenge();
         this.emitGameState(
-          `<span class="${previous.color}--text">${previous.username}</span> won the bid and needs to flip ${this.currentBidNumber} sand piles`,
-          `<span class="${previous.color}--text">${previous.username}</span> bid they can flip ${this.currentBidNumber} sand piles`,
+          `<span class="${previous.color}--text">${previous.username}</span> won the bid and needs to flip ${this.currentBidNumber} cards`,
+          `<span class="${previous.color}--text">${previous.username}</span> bid they can flip ${this.currentBidNumber} cards`,
           'challenge',
           previous.username,
         );
@@ -159,7 +159,7 @@ export default class Room {
       if (allPlayersPassed) {
         this.setupChallenge();
         this.emitGameState(
-          `<span class="${current.color}--text">${current.username}</span> won the bid and needs to flip ${this.currentBidNumber} sand piles`,
+          `<span class="${current.color}--text">${current.username}</span> won the bid and needs to flip ${this.currentBidNumber} cards`,
           `<span class="${previous.color}--text">${previous.username}</span> passed their bid`,
           'challenge',
         );
@@ -187,7 +187,7 @@ export default class Room {
       const current = this.getActiveDetails();
       this.emitGameState(
         `<span class="${current.color}--text">${current.username}</span>'s turn`,
-        `<span class="${current.color}--text">${current.username}</span> flipped ${tempCardsFlipped} coconuts and gains a pearl`,
+        `<span class="${current.color}--text">${current.username}</span> successfully flipped ${tempCardsFlipped} coconuts and gains a pearl`,
         'placingCards',
       );
     });
@@ -198,7 +198,7 @@ export default class Room {
       const current = this.getActiveDetails();
       this.emitGameState(
         `<span class="${current.color}--text">${current.username}</span>'s turn`,
-        `<span class="${current.color}--text">${current.username}</span> randomly loses an item`,
+        `<span class="${current.color}--text">${current.username}</span> randomly loses an card`,
         'placingCards',
       );
     });
@@ -218,7 +218,7 @@ export default class Room {
       const current = this.getActiveDetails();
       this.emitGameState(
         `<span class="${current.color}--text">${current.username}</span> starts the next round`,
-        `<span class="${current.color}--text">${current.username}</span> has chosen an item to remove`,
+        `<span class="${current.color}--text">${current.username}</span> has chosen a card to remove`,
         'placingCards',
         undefined,
         undefined,
@@ -272,8 +272,10 @@ export default class Room {
           current.username
         }</span> needs to flip ${
           this.currentBidNumber - this.cardsFlipped
-        } more`,
-        `<span class="${current.color}--text">${current.username}</span> flipped <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s coconut on flip ${this.cardsFlipped}`,
+        } more cards`,
+        current.username === flippedPlayer.username
+          ? `<span class="${current.color}--text">${current.username}</span> flipped <span class="${flippedPlayer.color}--text">their own</span> coconut on flip ${this.cardsFlipped}`
+          : `<span class="${current.color}--text">${current.username}</span> flipped <span class="${flippedPlayer.color}--text">${flippedPlayer.username}</span>'s coconut on flip ${this.cardsFlipped}`,
         'challenge',
       );
     }
@@ -327,14 +329,14 @@ export default class Room {
       }
       this.emitGameState(
         `<span class="${current.color}--text">${current.username}</span> is choosing a player to start the next round`,
-        `<span class="${current.color}--text">${current.username}</span> has no items left and has been eliminated`,
+        `<span class="${current.color}--text">${current.username}</span> has no cards left and has been eliminated`,
         'eliminated',
       );
       return;
     }
     // Has more than 1 card left, needs to choose a card to remove
     this.emitGameState(
-      `<span class="${current.color}--text">${current.username}</span> is choosing an item to remove`,
+      `<span class="${current.color}--text">${current.username}</span> is choosing a card to remove`,
       `<span class="${current.color}--text">${current.username}</span> flipped <span class="${flippedPlayer.color}--text">their own</span> crab`,
       'removeCardsPick',
       undefined,
@@ -367,11 +369,11 @@ export default class Room {
     newPlayer.slots[totalCardsLeft] = 4;
     const current = this.getActiveDetails();
     // Eliminated from the game if 0 cards left
-    this.currentMessageRandomlyLose = `<span class="${current.color}--text">${current.username}</span> randomly loses an item`;
+    this.currentMessageRandomlyLose = `<span class="${current.color}--text">${current.username}</span> randomly loses a card`;
     if (totalCardsLeft === 0) {
       this.eliminatedPlayers++;
       newPlayer.isEliminated = true;
-      this.currentMessageRandomlyLose = `<span class="${current.color}--text">${current.username}</span> has no more items and is eliminated</br>`;
+      this.currentMessageRandomlyLose = `<span class="${current.color}--text">${current.username}</span> has no more cards and is eliminated</br>`;
       this.activePlayerIndex = this.players.findIndex(
         (player) => player.username === flippedPlayer.username,
       );
@@ -449,7 +451,7 @@ export default class Room {
   playerWins(winningPlayer: Player, reason: string): void {
     let logMessage = `<span class="${winningPlayer.color}--text">${winningPlayer.username}</span> reached ${this.pointsToWin} pearls`;
     if (reason === 'eliminated') {
-      logMessage = `All other players have no items left and have beeen eliminated`;
+      logMessage = `All other players have no cards left and have been eliminated`;
     }
     this.activePlayerIndex = this.players.findIndex(
       (player) => player.username === winningPlayer.username,

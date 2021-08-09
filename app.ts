@@ -9,7 +9,7 @@ import logger from './lib/logger';
 // Start express server
 const app = express();
 
-// Serve static web files
+// Serve static web files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(__dirname + '/dist'));
 }
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'production') {
 const server = createServer(app);
 
 server.listen(serverConfig.port, () => {
-  // logger.info(`Socket listening on port ${serverConfig.socketPort}!`);
+  logger.info(`Socket listening on port ${serverConfig.port}!`);
 });
 
 const io = new Server(server, { cors: { origin: '*' } });
@@ -67,16 +67,6 @@ io.on('connection', async (socket: Socket) => {
           roomId: foundRoom.roomId,
         });
         logger.info(`${username} joined ${roomId}`);
-      }
-      // ! Remove for PROD
-      if (enterRoomAction === 'createDev') {
-        const createdRoom = skull.newRoomDev();
-        createdRoom.addPlayer(username, socket);
-        socket.emit('enterRoomSuccess', {
-          username: username,
-          roomId: createdRoom.roomId,
-        });
-        logger.info(`Room created: ${createdRoom.roomId}`);
       }
     },
   );

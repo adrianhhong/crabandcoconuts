@@ -2,12 +2,14 @@
   <div>
     <v-container class="text-center" style="max-width: 600px">
       <!-- Messages -->
-      <v-card height="180" class="my-4" color="backing">
+      <v-card class="my-1" color="backing">
         <v-card-title class="text-left">
           <h5 v-html="currentMessage"></h5>
         </v-card-title>
+      </v-card>
+      <v-card height="200" class="my-4" color="backing">
         <v-card-text
-          style="max-height: 105px; overflow-y: auto"
+          style="max-height: 200px; overflow-y: auto"
           class="text-left"
         >
           <div v-for="(message, index) in messageLog" :key="index">

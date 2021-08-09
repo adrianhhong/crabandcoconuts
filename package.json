@@ -1,16 +1,15 @@
 {
   "name": "skull",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Skull board game",
   "main": "app.ts",
   "scripts": {
-    "serve-client": "vue-cli-service serve",
-    "build-client": "vue-cli-service build",
-    "lint-client": "vue-cli-service lint",
-    "serve-server": "nodemon --config nodemon.json ./app.ts",
-    "start:debug": "nodemon --config nodemon.json --inspect-brk ./src/app.ts",
-    "lint-server": "eslint",
+    "serve:client": "vue-cli-service serve",
+    "serve:server": "nodemon --config nodemon.json ./app.ts",
+    "lint:client": "vue-cli-service lint",
+    "lint:server": "eslint",
     "start": "node dist/app.js",
+    "start:debug": "nodemon --config nodemon.json --inspect-brk ./src/app.ts",
     "build": "vue-cli-service build && tsc",
     "postinstall": "npm run build"
   },
