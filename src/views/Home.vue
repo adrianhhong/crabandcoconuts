@@ -14,58 +14,61 @@
           <v-divider class="mb-10" />
         </v-col>
       </v-row>
-      <v-form ref="name">
-        <v-text-field
-          outlined
-          rounded
-          v-model="username"
-          label="Enter your name"
-          maxlength="10"
-          :rules="[rules.nameRequired, rules.nameMax, rules.nameMin]"
-          @keydown.enter.prevent="onCreateGame"
-        ></v-text-field>
-      </v-form>
-      <v-container fluid style="height: 300px">
-        <v-row align="center">
-          <v-col class="text-center">
-            <v-row>
-              <v-col>
-                <v-btn color="buttons" rounded @click="onCreateGame"
-                  >Create</v-btn
-                >
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col class="text-center">or</v-col>
-          <v-col class="text-center">
-            <v-row>
-              <v-col>
-                <v-form ref="roomId">
-                  <v-text-field
-                    outlined
-                    rounded
-                    v-model="roomId"
-                    label="Room ID"
-                    maxlength="4"
-                    :rules="[
-                      rules.roomIdRequired,
-                      rules.roomIdLength,
-                    ]"
-                    @keydown.enter.prevent="onJoinGame"
-                  ></v-text-field>
-                </v-form>
-                <v-btn
-                  color="buttons"
-                  rounded
-                  @click="onJoinGame"
-                  class="mt-3"
-                  >Join</v-btn
-                >
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row></v-container
-      >
+      <v-row>
+        <v-col>
+          <v-form ref="name">
+            <v-text-field
+              outlined
+              rounded
+              v-model="username"
+              label="Name"
+              maxlength="10"
+              :rules="[
+                rules.nameRequired,
+                rules.nameMax,
+                rules.nameMin,
+              ]"
+              @keydown.enter.prevent="onCreateGame"
+            ></v-text-field>
+          </v-form>
+        </v-col>
+      </v-row>
+      <v-row align="center">
+        <v-col class="text-center">
+          <v-btn color="buttons" rounded @click="onCreateGame"
+            >Create</v-btn
+          >
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="text-center my-5"> or </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="text-center">
+          <v-form ref="roomId">
+            <v-text-field
+              outlined
+              rounded
+              v-model="roomId"
+              label="Room ID"
+              maxlength="4"
+              :rules="[rules.roomIdRequired, rules.roomIdLength]"
+              @keydown.enter.prevent="onJoinGame"
+            ></v-text-field>
+          </v-form>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="text-center">
+          <v-btn
+            color="buttons"
+            rounded
+            @click="onJoinGame"
+            class="mt-3"
+            >Join</v-btn
+          >
+        </v-col>
+      </v-row>
       <v-row>
         <v-col>
           <v-divider />
@@ -123,106 +126,143 @@
         </v-btn>
       </template>
     </v-snackbar>
-    <v-dialog v-model="showInstructions" width="800">
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          How to Play <v-spacer></v-spacer
-          ><v-btn icon @click="showInstructions = false"
-            ><v-icon> mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-text class="pt-4">
-          <h2>Object of the game</h2>
-          <span
-            >Win X number of Pearls by succeeding in X challenges, or
-            be the last non-eliminated player.</span
+    <v-dialog v-model="showInstructions" width="600">
+      <v-card flat tile>
+        <v-window v-model="instructionsWindow">
+          <v-window-item>
+            <v-card elevation="0" height="500">
+              <v-card-title>
+                TL;DR <v-spacer></v-spacer
+                ><v-btn icon @click="showInstructions = false"
+                  ><v-icon> mdi-close</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text
+                style="font-size: 1rem"
+                align="center"
+                justify="center"
+              >
+                <br />
+                <br />
+                <span style="font-size: 2rem">C</span>
+                hoose cards to play <br />
+                <br />
+                <span style="font-size: 2rem">R</span>
+                emove opponents cards
+                <br />
+                <br />
+                <span style="font-size: 2rem">A</span>
+                ccomplish successful bids <br />
+                <br />
+                <span style="font-size: 2rem">B</span>
+                ag enough pearls to win
+
+                <br />
+                <br />
+                <br />
+                <br /><v-icon size="60">$crab</v-icon>
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+          <v-window-item>
+            <v-card elevation="0" height="500">
+              <v-card-title>
+                Gameplay<v-spacer></v-spacer
+                ><v-btn icon @click="showInstructions = false"
+                  ><v-icon> mdi-close</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text
+                style="font-size: 0.85rem"
+                justify="center"
+              >
+                <h3>Step 1 - Adding Cards</h3>
+                <span
+                  >Each player chooses one of their cards (Coconut or
+                  Crab) to place down.</span
+                >
+                <br />
+                <br />
+                <h3>Step 2 - Adding More or Challenging</h3>
+                <span>
+                  The next player can add an extra card or challenge,
+                  which continues around. To challenge, the player
+                  will announce the number of Coconuts they think they
+                  can reveal from among all those played. Then, each
+                  subsequent player must:
+                  <ul>
+                    <li>
+                      <b>Increase the bid</b> on the previous
+                      challenge.
+                    </li>
+                    <li>
+                      <b>Or pass</b> if they do not think they can
+                      reveal a greater amount of Coconuts.
+                    </li>
+                  </ul>
+                  Play proceeds until all players except one pass.
+                </span>
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+          <v-window-item>
+            <v-card elevation="0" height="500">
+              <v-card-title>
+                <v-spacer></v-spacer
+                ><v-btn icon @click="showInstructions = false"
+                  ><v-icon> mdi-close</v-icon>
+                </v-btn>
+              </v-card-title>
+              <v-card-text
+                style="font-size: 0.85rem"
+                justify="center"
+              >
+                <h3>Step 3 - The Attempt</h3>
+                <span
+                  ><b>The Challenger must flip</b> a number of cards
+                  equal to their challenge noting the player must flip
+                  all of their <b>own cards first</b>.
+                </span>
+                <h4><u>Failed attempt</u></h4>
+                <span
+                  ><b>ONE CRAB</b> was flipped: the Challenger loses
+                  one card for good. If the Challenger loses their
+                  <b>last card</b>, they are <b>eliminated</b>.</span
+                >
+                <h4><u>Successful attempt</u></h4>
+                <span
+                  ><b>NO CRAB</b> was flipped: the Challenger gains a
+                  Pearl. First to X number of Pearls wins!
+                </span>
+                <br />
+                <br />
+                <h3>Step 4 - New Round</h3>
+                <span
+                  >The Challenger is the <b>first player</b> of the
+                  following round, which resumes on
+                  <b>step 1</b>.</span
+                >
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+        </v-window>
+        <v-card-actions class="justify-center">
+          <v-item-group
+            v-model="instructionsWindow"
+            class="text-center"
+            mandatory
           >
-          <br />
-          <br />
-          <br />
-          <h2>Gameplay</h2>
-          <h3>Step 1 - Turn preparation</h3>
-          <span
-            >Each player chooses one of their items (Coconut or Crab)
-            to place into their first sand pile. Once each player has
-            placed one item, play moves on to <b>step 2.</b></span
-          >
-          <br />
-          <br />
-          <h3>Step 2 - Adding or Challenge</h3>
-          <h4><u>Adding</u></h4>
-          <span>
-            If they so want, the first player can add
-            <b>an extra item</b>, to the right of their first sand
-            pile. The next player can then do the same,
-            <b>and so on</b>. This can continue around multiple times.
-          </span>
-          <h4><u>Challenge</u></h4>
-          <span>
-            If a player <b>cannot or does not want to</b> play an
-            additional item, the player
-            <b>issues a challenge.</b> They announce the number of
-            Coconuts they think they can reveal from among all those
-            played. Then, each subsequent player must:
-            <ul>
-              <li>
-                <b>Increase the bid</b> on the previous challenge by
-                announcing a greater number.
-              </li>
-              <li>
-                <b>Or pass</b> if they do not think they can reveal a
-                greater amount of Coconuts.
-              </li>
-            </ul>
-            Play proceeds until all players pass, save one:
-            <b>the player who bid the highest</b>, called the
-            <b>Challenger</b>.
-          </span>
-          <br />
-          <br />
-          <h3>Step 3 - The attempt</h3>
-          <span
-            ><b>The Challenger must flip</b> a number of sand piles
-            equal to their challenge while respecting the following
-            rules:
-            <ul>
-              <li>
-                The player <b>begins</b> by flipping
-                <b>all of THEIR own discs</b>.
-              </li>
-              <li>
-                They <b>continue</b> to flip discs with those of the
-                other players, and in the order they choose.
-              </li>
-            </ul>
-          </span>
-          <h4><u>Failed attempt</u></h4>
-          <span
-            ><b>ONE CRAB</b> was flipped: the Challenger has
-            <b>FAILED</b>. The challenger loses one item for good. If
-            they flipped their own Crab, they choose which item to
-            remove. If they flipped someone elses Crab, they lose a
-            random item. If the Challenger loses their
-            <b>last item</b>, they are <b>eliminated</b>. If all
-            players except one have been eliminated, the last
-            non-eliminated player wins!</span
-          >
-          <h4><u>Successful attempt</u></h4>
-          <span
-            ><b>NO CRAB</b> was flipped: the Challenger has
-            <b>SUCCEEDED</b>. The Challenger gains a Pearl. First to X
-            number of Pearls wins!
-          </span>
-          <br />
-          <br />
-          <h3>Step 4 - New round</h3>
-          <span
-            >Whether they've succeeded or failed,
-            <b>the Challenger is the first player</b> of the following
-            round, which resumes on <b>step 1</b>.</span
-          >
-        </v-card-text>
-        <v-divider></v-divider>
+            <v-item
+              v-for="n in 3"
+              :key="`btn-${n}`"
+              v-slot="{ active, toggle }"
+            >
+              <v-btn :input-value="active" icon @click="toggle">
+                <v-icon>mdi-record</v-icon>
+              </v-btn>
+            </v-item>
+          </v-item-group>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -247,6 +287,7 @@ export default {
       errorMessage: '',
       snackbarShow: false,
       showInstructions: false,
+      instructionsWindow: 0,
     };
   },
   created: function () {
