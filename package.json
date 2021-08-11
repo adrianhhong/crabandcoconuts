@@ -1,7 +1,7 @@
 {
-  "name": "skull",
+  "name": "crabandcoconuts",
   "version": "1.0.0",
-  "description": "Skull board game",
+  "description": "An online adaption of the bluffing based board game originally called Skull & Roses, but redesigned because crabs are cool.",
   "main": "app.ts",
   "scripts": {
     "serve:client": "vue-cli-service serve",
