@@ -11,7 +11,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-divider class="mb-10" />
+          <v-divider class="mb-2" />
         </v-col>
       </v-row>
       <v-row>
@@ -33,7 +33,7 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-row align="center">
+      <v-row no-gutters>
         <v-col class="text-center">
           <v-btn color="buttons" rounded @click="onCreateGame"
             >Create</v-btn
@@ -58,13 +58,9 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row no-gutters>
         <v-col class="text-center">
-          <v-btn
-            color="buttons"
-            rounded
-            @click="onJoinGame"
-            class="mt-3"
+          <v-btn color="buttons" rounded @click="onJoinGame"
             >Join</v-btn
           >
         </v-col>
@@ -165,7 +161,11 @@
             </v-card>
           </v-window-item>
           <v-window-item>
-            <v-card elevation="0" height="500">
+            <v-card
+              elevation="0"
+              height="500"
+              style="overflow-y: scroll"
+            >
               <v-card-title>
                 Gameplay<v-spacer></v-spacer
                 ><v-btn icon @click="showInstructions = false"
@@ -202,26 +202,13 @@
                   </ul>
                   Play proceeds until all players except one pass.
                 </span>
-              </v-card-text>
-            </v-card>
-          </v-window-item>
-          <v-window-item>
-            <v-card elevation="0" height="500">
-              <v-card-title>
-                <v-spacer></v-spacer
-                ><v-btn icon @click="showInstructions = false"
-                  ><v-icon> mdi-close</v-icon>
-                </v-btn>
-              </v-card-title>
-              <v-card-text
-                style="font-size: 0.85rem"
-                justify="center"
-              >
+                <br />
+                <br />
                 <h3>Step 3 - The Attempt</h3>
                 <span
                   ><b>The Challenger must flip</b> a number of cards
-                  equal to their challenge noting the player must flip
-                  all of their <b>own cards first</b>.
+                  equal to their challenge noting they must flip all
+                  of their <b>own cards first</b>.
                 </span>
                 <h4><u>Failed attempt</u></h4>
                 <span
@@ -253,7 +240,7 @@
             mandatory
           >
             <v-item
-              v-for="n in 3"
+              v-for="n in 2"
               :key="`btn-${n}`"
               v-slot="{ active, toggle }"
             >
