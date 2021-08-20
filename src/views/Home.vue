@@ -15,6 +15,9 @@
         </v-col>
       </v-row>
       <v-row>
+        <v-col class="text-center"> 1. Enter your name </v-col>
+      </v-row>
+      <v-row>
         <v-col>
           <v-form ref="name">
             <v-text-field
@@ -33,6 +36,9 @@
           </v-form>
         </v-col>
       </v-row>
+      <v-row class="my-5">
+        <v-col class="text-center"> 2. Create or Join a room! </v-col>
+      </v-row>
       <v-row no-gutters>
         <v-col class="text-center">
           <v-btn color="buttons" rounded @click="onCreateGame"
@@ -41,7 +47,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col class="text-center my-5"> or </v-col>
+        <v-col class="text-center my-1"> or </v-col>
       </v-row>
       <v-row>
         <v-col class="text-center">
@@ -54,6 +60,8 @@
               maxlength="4"
               :rules="[rules.roomIdRequired, rules.roomIdLength]"
               @keydown.enter.prevent="onJoinGame"
+              style="width: 180px"
+              class="mx-auto"
             ></v-text-field>
           </v-form>
         </v-col>
