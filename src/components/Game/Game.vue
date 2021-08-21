@@ -357,7 +357,6 @@ export default {
       this.bidNumber = newBidVariables.biddingMinimum;
     },
     playerStates(newPlayerStates) {
-      this.stopButtonRequests = false;
       if (this.gamePhase === 'placingCards') {
         const userPlayerState = newPlayerStates.find(
           (playerState) => playerState.username === this.username,
@@ -386,6 +385,7 @@ export default {
       );
       this.isEliminated =
         this.playerStates[indexOfPlayer].isEliminated;
+      this.stopButtonRequests = false;
     },
   },
   methods: {
